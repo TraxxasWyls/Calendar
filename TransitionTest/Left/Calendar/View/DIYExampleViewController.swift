@@ -25,6 +25,7 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
                firstDate > secondDate {
                 swap(&self.firstDate, &self.secondDate)
             }
+            print("first \(self.formatter.string(from: self.firstDate ?? Date()))")
         }
     }
     private var secondDate: Date? {
@@ -34,6 +35,7 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
                firstDate > secondDate {
                 swap(&self.firstDate, &self.secondDate)
             }
+            print("second \(self.formatter.string(from: self.secondDate ?? Date()))")
         }
     }
     
@@ -99,9 +101,6 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
 
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
 
-        print("did select date \(self.formatter.string(from: date))")
-        let isFirstDate = date == firstDate
-        let isSecondDate = date == secondDate
         if calendar.selectedDates.count == 1 {
             firstDate = date
         }
@@ -131,25 +130,18 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
                 }
             }
         }
-        if (isFirstDate) {
-            calendar.deselect(date)
-            firstDate = secondDate
-            secondDate = nil
-        }
-        if (isSecondDate) {
-            calendar.deselect(date)
-            secondDate = nil
-        }
+
         self.configureVisibleCells()
     }
 
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
-
-        calendar.deselect(date)
-        if date == firstDate {
-            firstDate = nil
+        let isFirstDate = date == firstDate
+        let isSecondDate = date == secondDate
+        if (isFirstDate) {
+            firstDate = secondDate
+            secondDate = nil
         }
-        if date == secondDate {
+        if (isSecondDate) {
             secondDate = nil
         }
         self.calendar(calendar, didDeselect: date)
@@ -157,8 +149,6 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     }
     
     func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
-        print("did deselect date \(self.formatter.string(from: date))")
-
         self.configureVisibleCells()
     }
     
