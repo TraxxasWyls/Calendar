@@ -81,18 +81,22 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
         self.calendar.frame.size.height = bounds.height
     }
-    
-    func calendar(_ calendar: FSCalendar, shouldSelect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
-        return true
-    }
-    
-    func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
-        return true
-    }
-    
+
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
+        var isInRange: Bool {
+            if var firstDate = firstDate,
+               var secondDate = secondDate {
+                if firstDate > secondDate {
+                    swap(&firstDate, &secondDate)
+                }
+                if (date < secondDate && date > firstDate) {
+                    return true
+                }
+            }
+            return false
+        }
         if calendar.selectedDates.count == 1 {
             firstDate = date
         }
@@ -100,12 +104,54 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             secondDate = date
         }
         print("did select date \(self.formatter.string(from: date))")
-        if (calendar.selectedDates.count > 2 && !isFirstDate && !isSecondDate) {
-            if let firstDate = firstDate {
+        if isInRange {
+
+            enum Sides {
+                case left
+                case right
+                case center
+            }
+
+            var side: Sides {
+                if let firstDate = self.firstDate,
+                   let secondDate = self.secondDate {
+                    let center = abs(secondDate.timeIntervalSince1970 - firstDate.timeIntervalSince1970) / 2
+                    let left = firstDate.timeIntervalSince1970
+                    let current = date.timeIntervalSince1970 - left
+                    if current - center < 0 {
+                        return .left
+                    }
+                    if current - center == 0 {
+                        return .center
+                    }
+                }
+                return .right
+            }
+
+            switch side {
+            case .right:
+                calendar.deselect(secondDate!)
+                self.secondDate = date
+            default:
+                calendar.deselect(firstDate!)
+                self.firstDate = date
+            }
+        }
+
+        if !isInRange,
+           var secondDate = secondDate,
+           var firstDate = firstDate {
+            if secondDate < firstDate {
+                swap(&firstDate, &secondDate)
+            }
+            if date > secondDate {
+                self.secondDate = date
+                calendar.deselect(secondDate)
+            }
+            if date < firstDate {
+                self.firstDate = date
                 calendar.deselect(firstDate)
             }
-            firstDate = secondDate
-            secondDate = date
         }
         if (isFirstDate) {
             calendar.deselect(date)
@@ -116,11 +162,25 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             calendar.deselect(date)
             secondDate = nil
         }
+
         self.configureVisibleCells()
+    }
+
+    func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+        calendar.deselect(date)
+        if date == firstDate {
+            firstDate = nil
+        }
+        if date == secondDate {
+            secondDate = nil
+        }
+        self.calendar(calendar, didDeselect: date)
+        return true
     }
     
     func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
         print("did deselect date \(self.formatter.string(from: date))")
+
         self.configureVisibleCells()
     }
     
@@ -128,9 +188,6 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     // MARK: - Private functions
     
     private func configureVisibleCells() {
-        if calendar.visibleCells().count > 2 {
-            calendar.visibleCells()
-        }
         calendar.visibleCells().forEach { (cell) in
             let date = calendar.date(for: cell)
             let position = calendar.monthPosition(for: cell)
@@ -175,3 +232,8 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     }
 }
 
+//        if var secondDate = secondDate,
+//           var firstDate = firstDate,
+//           secondDate < firstDate {
+//            swap(&secondDate, &firstDate)
+//        }

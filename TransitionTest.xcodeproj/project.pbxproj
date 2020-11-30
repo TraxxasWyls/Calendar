@@ -29,7 +29,6 @@
 		CB00DBAA2572A4B5000CCC11 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB00DB6D2572A4B5000CCC11 /* LaunchScreen.storyboard */; };
 		CB00DBAB2572A4B5000CCC11 /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB702572A4B5000CCC11 /* Optional.swift */; };
 		CB00DBAC2572A4B5000CCC11 /* RouterInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB722572A4B5000CCC11 /* RouterInput.swift */; };
-		CB00DBAD2572A4B5000CCC11 /* TransitionHandler.zip in Resources */ = {isa = PBXBuildFile; fileRef = CB00DB732572A4B5000CCC11 /* TransitionHandler.zip */; };
 		CB00DBAE2572A4B5000CCC11 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB742572A4B5000CCC11 /* Router.swift */; };
 		CB00DBAF2572A4B5000CCC11 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB772572A4B5000CCC11 /* UIViewController.swift */; };
 		CB00DBB02572A4B5000CCC11 /* TransitionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB792572A4B5000CCC11 /* TransitionHandler.swift */; };
@@ -78,7 +77,6 @@
 		CB00DB6E2572A4B5000CCC11 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CB00DB702572A4B5000CCC11 /* Optional.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optional.swift; sourceTree = "<group>"; };
 		CB00DB722572A4B5000CCC11 /* RouterInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RouterInput.swift; sourceTree = "<group>"; };
-		CB00DB732572A4B5000CCC11 /* TransitionHandler.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = TransitionHandler.zip; sourceTree = "<group>"; };
 		CB00DB742572A4B5000CCC11 /* Router.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		CB00DB772572A4B5000CCC11 /* UIViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		CB00DB792572A4B5000CCC11 /* TransitionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransitionHandler.swift; sourceTree = "<group>"; };
@@ -220,7 +218,6 @@
 			isa = PBXGroup;
 			children = (
 				CB00DB722572A4B5000CCC11 /* RouterInput.swift */,
-				CB00DB732572A4B5000CCC11 /* TransitionHandler.zip */,
 				CB00DB742572A4B5000CCC11 /* Router.swift */,
 				CB00DB752572A4B5000CCC11 /* TransitionHandler */,
 			);
@@ -427,7 +424,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB00DBA32572A4B5000CCC11 /* Assets.xcassets in Resources */,
-				CB00DBAD2572A4B5000CCC11 /* TransitionHandler.zip in Resources */,
 				CB00DBAA2572A4B5000CCC11 /* LaunchScreen.storyboard in Resources */,
 				CB00DBBF2572A4B5000CCC11 /* Main.storyboard in Resources */,
 			);
