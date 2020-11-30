@@ -17,10 +17,25 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
-    
     fileprivate weak var calendar: FSCalendar!
-    private var firstDate: Date?
-    private var secondDate: Date?
+    private var firstDate: Date? {
+        didSet {
+            if let secondDate = secondDate,
+               let firstDate = firstDate,
+               firstDate > secondDate {
+                swap(&self.firstDate, &self.secondDate)
+            }
+        }
+    }
+    private var secondDate: Date? {
+        didSet {
+            if let secondDate = secondDate,
+               let firstDate = firstDate,
+               firstDate > secondDate {
+                swap(&self.firstDate, &self.secondDate)
+            }
+        }
+    }
     
     // MARK:- Life cycle
     
@@ -83,74 +98,37 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     }
 
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+
+        print("did select date \(self.formatter.string(from: date))")
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
-        var isInRange: Bool {
-            if var firstDate = firstDate,
-               var secondDate = secondDate {
-                if firstDate > secondDate {
-                    swap(&firstDate, &secondDate)
-                }
-                if (date < secondDate && date > firstDate) {
-                    return true
-                }
-            }
-            return false
-        }
         if calendar.selectedDates.count == 1 {
             firstDate = date
         }
         if calendar.selectedDates.count == 2 {
             secondDate = date
         }
-        print("did select date \(self.formatter.string(from: date))")
-        if isInRange {
-
-            enum Sides {
-                case left
-                case right
-                case center
-            }
-
-            var side: Sides {
-                if let firstDate = self.firstDate,
-                   let secondDate = self.secondDate {
-                    let center = abs(secondDate.timeIntervalSince1970 - firstDate.timeIntervalSince1970) / 2
-                    let left = firstDate.timeIntervalSince1970
-                    let current = date.timeIntervalSince1970 - left
-                    if current - center < 0 {
-                        return .left
-                    }
-                    if current - center == 0 {
-                        return .center
-                    }
+        if let firstDate = firstDate,
+           let secondDate = secondDate {
+            if date.isInRange(firstDate, secondDate) {
+                let side = date.sideInRange(firstDate, secondDate)
+                switch side {
+                case .right:
+                    calendar.deselect(secondDate)
+                    self.secondDate = date
+                default:
+                    calendar.deselect(firstDate)
+                    self.firstDate = date
                 }
-                return .right
-            }
-
-            switch side {
-            case .right:
-                calendar.deselect(secondDate!)
-                self.secondDate = date
-            default:
-                calendar.deselect(firstDate!)
-                self.firstDate = date
-            }
-        }
-
-        if !isInRange,
-           var secondDate = secondDate,
-           var firstDate = firstDate {
-            if secondDate < firstDate {
-                swap(&firstDate, &secondDate)
-            }
-            if date > secondDate {
-                self.secondDate = date
-                calendar.deselect(secondDate)
-            }
-            if date < firstDate {
-                self.firstDate = date
-                calendar.deselect(firstDate)
+            } else {
+                if date > secondDate {
+                    self.secondDate = date
+                    calendar.deselect(secondDate)
+                }
+                if date < firstDate {
+                    self.firstDate = date
+                    calendar.deselect(firstDate)
+                }
             }
         }
         if (isFirstDate) {
@@ -162,11 +140,11 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             calendar.deselect(date)
             secondDate = nil
         }
-
         self.configureVisibleCells()
     }
 
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+
         calendar.deselect(date)
         if date == firstDate {
             firstDate = nil
@@ -198,9 +176,6 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     private func configure(cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         
         let diyCell = (cell as! DIYCalendarCell)
-
-        // Configure selection layer
-
         var selectionType = SelectionType.none
         if date == secondDate || date == firstDate
             || date == calendar.today {
@@ -208,17 +183,14 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
         }
         if let secondDate = secondDate,
            let firstDate = firstDate {
-            if (firstDate < secondDate && (date < secondDate && date > firstDate))
-                || (firstDate > secondDate && (date > secondDate && date < firstDate)){
+            if  date.isInRange(firstDate, secondDate){
                 selectionType = .middle
             }
             if calendar.selectedDates.contains(date) {
-                if date == firstDate && firstDate < secondDate ||
-                    date == secondDate && firstDate > secondDate {
+                if date == firstDate {
                     selectionType = .leftBorder
                 }
-                if date == secondDate && firstDate < secondDate ||
-                    date == firstDate && firstDate > secondDate {
+                if date == secondDate {
                     selectionType = .rightBorder
                 }
             }
@@ -231,9 +203,3 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
         diyCell.selectionType = selectionType
     }
 }
-
-//        if var secondDate = secondDate,
-//           var firstDate = firstDate,
-//           secondDate < firstDate {
-//            swap(&secondDate, &firstDate)
-//        }
