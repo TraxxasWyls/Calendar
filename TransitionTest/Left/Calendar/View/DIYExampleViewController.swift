@@ -20,21 +20,16 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     fileprivate weak var calendar: FSCalendar!
     private var firstDate: Date? {
         didSet {
-            if let secondDate = secondDate,
-               let firstDate = firstDate,
-               firstDate > secondDate {
-                swap(&self.firstDate, &self.secondDate)
-            }
             print("first \(self.formatter.string(from: self.firstDate ?? Date()))")
         }
     }
     private var secondDate: Date? {
         didSet {
-            if let secondDate = secondDate,
-               let firstDate = firstDate,
-               firstDate > secondDate {
-                swap(&self.firstDate, &self.secondDate)
-            }
+                if let secondDate = secondDate,
+                   let firstDate = firstDate,
+                   firstDate > secondDate {
+                    swap(&self.firstDate, &self.secondDate)
+                }
             print("second \(self.formatter.string(from: self.secondDate ?? Date()))")
         }
     }
@@ -100,12 +95,35 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     }
 
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
-
-        if calendar.selectedDates.count == 1 {
+        let isFirstDate = date == firstDate
+        let isSecondDate = date == secondDate
+        if calendar.selectedDates.count == 1,
+           !isSecondDate,
+           !isFirstDate {
             firstDate = date
+            secondDate = nil
         }
-        if calendar.selectedDates.count == 2 {
-            secondDate = date
+        if calendar.selectedDates.count == 2,
+           !isSecondDate,
+           !isFirstDate {
+            if let secondDate = secondDate {
+                if date < secondDate {
+                    if !calendar.selectedDates.contains(secondDate) {
+                        self.secondDate = self.firstDate
+                    }
+                    firstDate = date
+                } else {
+                    if let firstDate = firstDate,
+                       !calendar.selectedDates.contains(firstDate) {
+                        self.firstDate = self.secondDate
+                    }
+                    self.secondDate = date
+                }
+            } else {
+                secondDate = date
+                self.configureVisibleCells()
+                return
+            }
         }
         if let firstDate = firstDate,
            let secondDate = secondDate {
@@ -130,11 +148,18 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
                 }
             }
         }
-
+        if isFirstDate || isSecondDate {
+            calendar.deselect(date)
+            self.calendar(calendar,didDeselect: date)
+        }
         self.configureVisibleCells()
     }
 
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+        return true
+    }
+    
+    func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
         if (isFirstDate) {
@@ -144,11 +169,6 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
         if (isSecondDate) {
             secondDate = nil
         }
-        self.calendar(calendar, didDeselect: date)
-        return true
-    }
-    
-    func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
         self.configureVisibleCells()
     }
     
