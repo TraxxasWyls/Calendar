@@ -18,21 +18,40 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
         return formatter
     }()
     fileprivate weak var calendar: FSCalendar!
+    private enum Condition {
+        case didDeselect
+        case didSelect
+        case shouldDeselect
+        case shouldSelect
+    }
     private var firstDate: Date? {
         didSet {
+            if firstDate != nil {
+                firstCondition = .didSelect
+            } else {
+                firstCondition = .didDeselect
+            }
             print("first \(self.formatter.string(from: self.firstDate ?? Date()))")
         }
     }
     private var secondDate: Date? {
         didSet {
-                if let secondDate = secondDate,
-                   let firstDate = firstDate,
-                   firstDate > secondDate {
-                    swap(&self.firstDate, &self.secondDate)
-                }
+            if let secondDate = secondDate,
+               let firstDate = firstDate,
+               firstDate > secondDate {
+                swap(&self.firstDate, &self.secondDate)
+            }
+            if secondDate != nil {
+                secondCondition = .didSelect
+            } else {
+                secondCondition = .didDeselect
+            }
             print("second \(self.formatter.string(from: self.secondDate ?? Date()))")
         }
     }
+    private var firstCondition: Condition = .didDeselect
+    private var secondCondition: Condition = .didDeselect
+
     
     // MARK:- Life cycle
     
@@ -100,8 +119,14 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
         if calendar.selectedDates.count == 1,
            !isSecondDate,
            !isFirstDate {
-            firstDate = date
-            secondDate = nil
+            if firstCondition == .shouldDeselect {
+                calendar.select(firstDate)
+                firstCondition = .didSelect
+                secondDate = date
+            } else {
+                firstDate = date
+                secondDate = nil
+            }
         }
         if calendar.selectedDates.count == 2,
            !isSecondDate,
@@ -109,9 +134,10 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             if let secondDate = secondDate {
                 if date < secondDate {
                     if !calendar.selectedDates.contains(secondDate) {
-                        self.secondDate = self.firstDate
+                        self.secondDate = date
+                    } else {
+                        firstDate = date
                     }
-                    firstDate = date
                 } else {
                     if let firstDate = firstDate,
                        !calendar.selectedDates.contains(firstDate) {
@@ -149,6 +175,16 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             }
         }
         if isFirstDate || isSecondDate {
+            if let gestureRecognizer = calendar.gestureRecognizers?.first,
+               gestureRecognizer.state == .failed {
+                if isFirstDate {
+                    firstCondition = .didSelect
+                }
+                if isSecondDate {
+                    secondCondition = .didSelect
+                }
+                return
+            }
             calendar.deselect(date)
             self.calendar(calendar,didDeselect: date)
         }
@@ -156,6 +192,25 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     }
 
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+        let isFirstDate = date == firstDate
+        let isSecondDate = date == secondDate
+        if isFirstDate {
+            firstCondition = .shouldDeselect
+        }
+        if isSecondDate {
+            secondCondition = .shouldDeselect
+        }
+        if firstCondition == .shouldDeselect,
+           secondCondition == .shouldDeselect,
+           let firstDate = firstDate,
+           let secondDate = secondDate {
+            calendar.deselect(firstDate)
+            calendar.deselect(secondDate)
+            self.firstDate = nil
+            self.secondDate = nil
+            self.calendar(calendar,didDeselect: firstDate)
+            self.calendar(calendar,didDeselect: secondDate)
+        }
         return true
     }
     
