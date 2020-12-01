@@ -9,21 +9,18 @@
 import Foundation
 import FSCalendar
 
-class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance {
+class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance {
     
-    fileprivate let gregorian = Calendar(identifier: .gregorian)
-    fileprivate let formatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
-    fileprivate weak var calendar: FSCalendar!
+    private let gregorian = Calendar(identifier: .gregorian)
+    private var calendar = FSCalendar()
+
     private enum Condition {
         case didDeselect
         case didSelect
         case shouldDeselect
         case shouldSelect
     }
+
     private var firstDate: Date? {
         didSet {
             if firstDate != nil {
@@ -31,9 +28,9 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             } else {
                 firstCondition = .didDeselect
             }
-            print("first \(self.formatter.string(from: self.firstDate ?? Date()))")
         }
     }
+
     private var secondDate: Date? {
         didSet {
             if let secondDate = secondDate,
@@ -46,49 +43,60 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
             } else {
                 secondCondition = .didDeselect
             }
-            print("second \(self.formatter.string(from: self.secondDate ?? Date()))")
         }
     }
+
     private var firstCondition: Condition = .didDeselect
     private var secondCondition: Condition = .didDeselect
 
-    
     // MARK:- Life cycle
-    
-    override func loadView() {
-        
-        let view = UIView(frame: UIScreen.main.bounds)
-        view.backgroundColor = .systemBackground
-        self.view = view
-        let height: CGFloat = UIDevice.current.model.hasPrefix("iPad") ? 400 : 800
-        let calendar = FSCalendar(frame: CGRect(x: 0, y: self.navigationController!.navigationBar.frame.maxY, width: view.frame.size.width, height: height))
-        calendar.dataSource = self
-        calendar.delegate = self
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureView()
+        configureCalendar()
+        configureNavigation()
+        setupCalendar(dataSource: self, delegate: self)
+        view.addSubview(calendar)
+    }
+
+    func configureCalendar() {
         calendar.allowsMultipleSelection = true
         calendar.scrollDirection = .vertical
         calendar.scrollEnabled = true
         calendar.pagingEnabled = false
         calendar.firstWeekday = 2
         calendar.placeholderType = .none
-        view.addSubview(calendar)
-        self.calendar = calendar
-        
         calendar.calendarHeaderView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
         calendar.calendarWeekdayView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
         calendar.appearance.eventSelectionColor = UIColor.red
-        calendar.register(DIYCalendarCell.self, forCellReuseIdentifier: "cell")
-        calendar.swipeToChooseGesture.isEnabled = true // Swipe-To-Choose
-        
+        calendar.register(CalendarCell.self, forCellReuseIdentifier: "cell")
+        calendar.swipeToChooseGesture.isEnabled = true
         let scopeGesture = UIPanGestureRecognizer(target: calendar, action: #selector(calendar.handleScopeGesture(_:)));
         calendar.addGestureRecognizer(scopeGesture)
+    }
 
+    func configureNavigation() {
         let todayItem = UIBarButtonItem(title: "Today", style: .plain, target: self, action: #selector(self.todayItemClicked(sender:)))
         self.navigationItem.rightBarButtonItem = todayItem
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.title = "Calendar"
+
+    func configureView() {
+        view = UIView(frame: UIScreen.main.bounds)
+        view.backgroundColor = .systemBackground
+        title = "Calendar"
+    }
+
+    func setupCalendar(dataSource: FSCalendarDataSource,
+                       delegate: FSCalendarDelegate) {
+        if let navigationController = navigationController {
+            calendar.frame = CGRect(x: 0,
+                                    y: navigationController.navigationBar.frame.maxY,
+                                    width: view.frame.size.width,
+                                    height: view.frame.size.height)
+        }
+        calendar.dataSource = dataSource
+        calendar.delegate = delegate
     }
 
     @objc
@@ -109,10 +117,6 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
 
     // MARK:- FSCalendarDelegate
     
-    func calendar(_ calendar: FSCalendar, boundingRectWillChange bounds: CGRect, animated: Bool) {
-        self.calendar.frame.size.height = bounds.height
-    }
-
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
@@ -240,7 +244,7 @@ class DIYExampleViewController: UIViewController, FSCalendarDataSource, FSCalend
     
     private func configure(cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         
-        let diyCell = (cell as! DIYCalendarCell)
+        let diyCell = (cell as! CalendarCell)
         var selectionType = SelectionType.none
         if date == secondDate || date == firstDate
             || date == calendar.today {

@@ -9,11 +9,11 @@ import Foundation
 
 final class LeftModule: Module {
 
-    static func instantiate() -> DIYExampleViewController {
-        DIYExampleViewController()
+    static func instantiate() -> CalendarViewController {
+        CalendarViewController()
     }
 
-    typealias View = DIYExampleViewController
+    typealias View = CalendarViewController
 
     typealias Input = LeftViewControllerInput
 

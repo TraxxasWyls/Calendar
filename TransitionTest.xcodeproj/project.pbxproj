@@ -21,9 +21,9 @@
 		CB00DBA22572A4B5000CCC11 /* MainRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB632572A4B5000CCC11 /* MainRouter.swift */; };
 		CB00DBA32572A4B5000CCC11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB00DB642572A4B5000CCC11 /* Assets.xcassets */; };
 		CB00DBA42572A4B5000CCC11 /* LeftViewControllerInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB662572A4B5000CCC11 /* LeftViewControllerInput.swift */; };
-		CB00DBA52572A4B5000CCC11 /* DIYExampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB672572A4B5000CCC11 /* DIYExampleViewController.swift */; };
+		CB00DBA52572A4B5000CCC11 /* CalendarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB672572A4B5000CCC11 /* CalendarViewController.swift */; };
 		CB00DBA62572A4B5000CCC11 /* LeftModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB682572A4B5000CCC11 /* LeftModule.swift */; };
-		CB00DBA72572A4B5000CCC11 /* DIYCalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB692572A4B5000CCC11 /* DIYCalendarCell.swift */; };
+		CB00DBA72572A4B5000CCC11 /* CalendarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB692572A4B5000CCC11 /* CalendarCell.swift */; };
 		CB00DBA82572A4B5000CCC11 /* LeftRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB6B2572A4B5000CCC11 /* LeftRouter.swift */; };
 		CB00DBA92572A4B5000CCC11 /* LeftRouterInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB6C2572A4B5000CCC11 /* LeftRouterInput.swift */; };
 		CB00DBAA2572A4B5000CCC11 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB00DB6D2572A4B5000CCC11 /* LaunchScreen.storyboard */; };
@@ -70,9 +70,9 @@
 		CB00DB632572A4B5000CCC11 /* MainRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainRouter.swift; sourceTree = "<group>"; };
 		CB00DB642572A4B5000CCC11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CB00DB662572A4B5000CCC11 /* LeftViewControllerInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftViewControllerInput.swift; sourceTree = "<group>"; };
-		CB00DB672572A4B5000CCC11 /* DIYExampleViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DIYExampleViewController.swift; sourceTree = "<group>"; };
+		CB00DB672572A4B5000CCC11 /* CalendarViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarViewController.swift; sourceTree = "<group>"; };
 		CB00DB682572A4B5000CCC11 /* LeftModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftModule.swift; sourceTree = "<group>"; };
-		CB00DB692572A4B5000CCC11 /* DIYCalendarCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DIYCalendarCell.swift; sourceTree = "<group>"; };
+		CB00DB692572A4B5000CCC11 /* CalendarCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarCell.swift; sourceTree = "<group>"; };
 		CB00DB6B2572A4B5000CCC11 /* LeftRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftRouter.swift; sourceTree = "<group>"; };
 		CB00DB6C2572A4B5000CCC11 /* LeftRouterInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftRouterInput.swift; sourceTree = "<group>"; };
 		CB00DB6E2572A4B5000CCC11 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -192,7 +192,7 @@
 			children = (
 				CB73D1C4257578F70075107B /* Calendar */,
 				CB00DB682572A4B5000CCC11 /* LeftModule.swift */,
-				CB00DB692572A4B5000CCC11 /* DIYCalendarCell.swift */,
+				CB00DB662572A4B5000CCC11 /* LeftViewControllerInput.swift */,
 				CB00DB6A2572A4B5000CCC11 /* Router */,
 			);
 			path = Left;
@@ -367,8 +367,8 @@
 		CB73D1C5257579530075107B /* View */ = {
 			isa = PBXGroup;
 			children = (
-				CB00DB672572A4B5000CCC11 /* DIYExampleViewController.swift */,
-				CB00DB662572A4B5000CCC11 /* LeftViewControllerInput.swift */,
+				CB00DB692572A4B5000CCC11 /* CalendarCell.swift */,
+				CB00DB672572A4B5000CCC11 /* CalendarViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -505,7 +505,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB00DBA72572A4B5000CCC11 /* DIYCalendarCell.swift in Sources */,
+				CB00DBA72572A4B5000CCC11 /* CalendarCell.swift in Sources */,
 				CB00DB972572A4B5000CCC11 /* RightModule.swift in Sources */,
 				CB00DBB92572A4B5000CCC11 /* ModuleInput.swift in Sources */,
 				CB00DBB62572A4B5000CCC11 /* ViperTransitionPromise.swift in Sources */,
@@ -534,7 +534,7 @@
 				CB00DBAF2572A4B5000CCC11 /* UIViewController.swift in Sources */,
 				CB00DBC12572A4B5000CCC11 /* MainModule.swift in Sources */,
 				CB00DBA12572A4B5000CCC11 /* MainRouterInput.swift in Sources */,
-				CB00DBA52572A4B5000CCC11 /* DIYExampleViewController.swift in Sources */,
+				CB00DBA52572A4B5000CCC11 /* CalendarViewController.swift in Sources */,
 				CB00DBA62572A4B5000CCC11 /* LeftModule.swift in Sources */,
 				CB00DBA92572A4B5000CCC11 /* LeftRouterInput.swift in Sources */,
 				CB00DBAC2572A4B5000CCC11 /* RouterInput.swift in Sources */,

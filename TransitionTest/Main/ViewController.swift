@@ -18,7 +18,7 @@ class ViewController: UIViewController {
 
     @IBAction func left(_ sender: Any) {
 //        router.openLeft(with: "self.description")
-        let navigationController = UINavigationController(rootViewController: DIYExampleViewController())
+        let navigationController = UINavigationController(rootViewController: CalendarViewController())
         present(navigationController, animated: true)
     }
 
