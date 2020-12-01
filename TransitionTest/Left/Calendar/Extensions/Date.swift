@@ -10,7 +10,6 @@ import Foundation
 extension Date {
     
     public func isInRange(_ left: Date, _ right: Date) -> Bool {
-
         if (self < right && self > left) {
             return true
         }
@@ -24,7 +23,6 @@ extension Date {
     }
 
     public func sideInRange(_ left: Date, _ right: Date) -> Side {
-
         let center = (right.timeIntervalSince1970 - left.timeIntervalSince1970) / 2
         let left = left.timeIntervalSince1970
         let current = self.timeIntervalSince1970 - left

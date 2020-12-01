@@ -10,17 +10,17 @@ import Foundation
 import UIKit
 import FSCalendar
 
-enum SelectionType: Int {
-    case none
-    case single
-    case leftBorder
-    case middle
-    case rightBorder
-}
-
 class CalendarCell: FSCalendarCell {
 
     var selectionLayer = CAShapeLayer()
+
+    enum SelectionType: Int {
+        case none
+        case single
+        case leftBorder
+        case middle
+        case rightBorder
+    }
     
     var selectionType: SelectionType = .none {
         didSet {

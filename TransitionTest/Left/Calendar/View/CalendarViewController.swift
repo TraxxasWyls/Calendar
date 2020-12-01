@@ -5,6 +5,8 @@
 //  Created by dingwenchao on 06/11/2016.
 //  Copyright © 2016 wenchao. All rights reserved.
 //
+// Мне не нравится как часто я определял isFirst...
+// И немного не логичные уточнения на 208 строке и 211
 
 import Foundation
 import FSCalendar
@@ -15,6 +17,7 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
 
     private var calendar = FSCalendar()
 
+    /// Состояния для границ отрезка
     private enum Condition {
         case didDeselect
         case didSelect
@@ -22,20 +25,27 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         case shouldSelect
     }
 
-    private var firstCondition: Condition = .didDeselect
+    /// Состояние левой границы
+    private var ConditionOfFirstDate: Condition = .didDeselect
 
-    private var secondCondition: Condition = .didDeselect
+    /// Правой
+    private var ConditionOfSecondDate: Condition = .didDeselect
 
+    /// Левая грацица, при изменении которой автоматически
+    /// контролируются некотрые состояния
     private var firstDate: Date? {
         didSet {
             if firstDate != nil {
-                firstCondition = .didSelect
+                ConditionOfFirstDate = .didSelect
             } else {
-                firstCondition = .didDeselect
+                ConditionOfFirstDate = .didDeselect
             }
         }
     }
 
+    /// Правая грацица, при изменении которой автоматически
+    /// контролируются некотрые состояния, а также она следит за тем,
+    /// чтобы всегда соблюдалось условие:  направления отрезка слева направо
     private var secondDate: Date? {
         didSet {
             if let secondDate = secondDate,
@@ -44,9 +54,9 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
                 swap(&self.firstDate, &self.secondDate)
             }
             if secondDate != nil {
-                secondCondition = .didSelect
+                ConditionOfSecondDate = .didSelect
             } else {
-                secondCondition = .didDeselect
+                ConditionOfSecondDate = .didDeselect
             }
         }
     }
@@ -109,7 +119,7 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
     func todayItemClicked(sender: AnyObject) {
         self.calendar.setCurrentPage(Date(), animated: true)
     }
-    
+
     // MARK:- FSCalendarDataSource
     
     func calendar(_ calendar: FSCalendar, cellFor date: Date, at position: FSCalendarMonthPosition) -> FSCalendarCell {
@@ -122,22 +132,27 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
     }
 
     // MARK:- FSCalendarDelegate
-    
+
+    /// Обработка нажатия на ячейку ведущего к выделению
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
+
+        /// Ситуации, когда у нас выделен только сегодняшний день
         if calendar.selectedDates.count == 1,
            !isSecondDate,
            !isFirstDate {
-            if firstCondition == .shouldDeselect {
+            switch ConditionOfFirstDate {
+            case .shouldDeselect:
                 calendar.select(firstDate)
-                firstCondition = .didSelect
+                ConditionOfFirstDate = .didSelect
                 secondDate = date
-            } else {
+            default:
                 firstDate = date
                 secondDate = nil
             }
         }
+        /// Только сегодня и первая дата
         if calendar.selectedDates.count == 2,
            !isSecondDate,
            !isFirstDate {
@@ -161,6 +176,7 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
                 return
             }
         }
+        /// Дата находится в отрезке между первой и второй
         if let firstDate = firstDate,
            let secondDate = secondDate {
             if date.isInRange(firstDate, secondDate) {
@@ -173,7 +189,7 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
                     calendar.deselect(firstDate)
                     self.firstDate = date
                 }
-            } else {
+            } else { /// Дата находится вне отрезка между первой и второй
                 if date > secondDate {
                     self.secondDate = date
                     calendar.deselect(secondDate)
@@ -184,14 +200,16 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
                 }
             }
         }
+        /// Последняя ситуация когда нажали на один из краев
         if isFirstDate || isSecondDate {
+            /// Позовляет с менять состояние удержанием
             if let gestureRecognizer = calendar.gestureRecognizers?.first,
                gestureRecognizer.state == .failed {
                 if isFirstDate {
-                    firstCondition = .didSelect
+                    ConditionOfFirstDate = .didSelect
                 }
                 if isSecondDate {
-                    secondCondition = .didSelect
+                    ConditionOfSecondDate = .didSelect
                 }
                 return
             }
@@ -201,17 +219,19 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         self.configureVisibleCells()
     }
 
+    /// Обработка промежуточного состояния
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
         if isFirstDate {
-            firstCondition = .shouldDeselect
+            ConditionOfFirstDate = .shouldDeselect
         }
         if isSecondDate {
-            secondCondition = .shouldDeselect
+            ConditionOfSecondDate = .shouldDeselect
         }
-        if firstCondition == .shouldDeselect,
-           secondCondition == .shouldDeselect,
+        /// Отмена отрезка если обе в промежуточном состоянии
+        if ConditionOfFirstDate == .shouldDeselect,
+           ConditionOfSecondDate == .shouldDeselect,
            let firstDate = firstDate,
            let secondDate = secondDate {
             calendar.deselect(firstDate)
@@ -223,21 +243,22 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         }
         return true
     }
-    
+
+    /// Обработка отмены выделения
     func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
-        if (isFirstDate) {
+        if isFirstDate {
             firstDate = secondDate
             secondDate = nil
         }
-        if (isSecondDate) {
+        if isSecondDate {
             secondDate = nil
         }
         self.configureVisibleCells()
     }
-    
-    // MARK: - Private functions
+
+    // MARK: - Private
     
     private func configureVisibleCells() {
         calendar.visibleCells().forEach { (cell) in
@@ -246,11 +267,14 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
             self.configure(cell: cell, for: date!, at: position)
         }
     }
-    
+
+    /// Определения какой  слой поставить в соответсвие для выделения
     private func configure(cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         let diyCell = (cell as? CalendarCell)
-        var selectionType = SelectionType.none
-        if date == secondDate || date == firstDate
+        let isFirstDate = date == firstDate
+        let isSecondDate = date == secondDate
+        var selectionType = CalendarCell.SelectionType.none
+        if isFirstDate || isSecondDate
             || date == calendar.today {
             selectionType = .single
         }
