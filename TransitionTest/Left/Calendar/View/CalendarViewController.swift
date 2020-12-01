@@ -12,6 +12,7 @@ import FSCalendar
 class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendarDelegate, FSCalendarDelegateAppearance {
     
     private let gregorian = Calendar(identifier: .gregorian)
+
     private var calendar = FSCalendar()
 
     private enum Condition {
@@ -20,6 +21,10 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         case shouldDeselect
         case shouldSelect
     }
+
+    private var firstCondition: Condition = .didDeselect
+
+    private var secondCondition: Condition = .didDeselect
 
     private var firstDate: Date? {
         didSet {
@@ -46,9 +51,6 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         }
     }
 
-    private var firstCondition: Condition = .didDeselect
-    private var secondCondition: Condition = .didDeselect
-
     // MARK:- Life cycle
 
     override func viewDidLoad() {
@@ -72,7 +74,10 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         calendar.appearance.eventSelectionColor = UIColor.red
         calendar.register(CalendarCell.self, forCellReuseIdentifier: "cell")
         calendar.swipeToChooseGesture.isEnabled = true
-        let scopeGesture = UIPanGestureRecognizer(target: calendar, action: #selector(calendar.handleScopeGesture(_:)));
+        let scopeGesture = UIPanGestureRecognizer(
+            target: calendar,
+            action: #selector(calendar.handleScopeGesture(_:))
+        )
         calendar.addGestureRecognizer(scopeGesture)
     }
 
@@ -87,13 +92,14 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         title = "Calendar"
     }
 
-    func setupCalendar(dataSource: FSCalendarDataSource,
-                       delegate: FSCalendarDelegate) {
+    func setupCalendar(dataSource: FSCalendarDataSource, delegate: FSCalendarDelegate) {
         if let navigationController = navigationController {
-            calendar.frame = CGRect(x: 0,
-                                    y: navigationController.navigationBar.frame.maxY,
-                                    width: view.frame.size.width,
-                                    height: view.frame.size.height)
+            calendar.frame = CGRect(
+                x: 0,
+                y: navigationController.navigationBar.frame.maxY,
+                width: view.frame.size.width,
+                height: view.frame.size.height
+            )
         }
         calendar.dataSource = dataSource
         calendar.delegate = delegate
@@ -231,7 +237,6 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
         self.configureVisibleCells()
     }
     
-    
     // MARK: - Private functions
     
     private func configureVisibleCells() {
@@ -243,8 +248,7 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
     }
     
     private func configure(cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
-        
-        let diyCell = (cell as! CalendarCell)
+        let diyCell = (cell as? CalendarCell)
         var selectionType = SelectionType.none
         if date == secondDate || date == firstDate
             || date == calendar.today {
@@ -265,10 +269,10 @@ class CalendarViewController: UIViewController, FSCalendarDataSource, FSCalendar
             }
         }
         if selectionType == .none {
-            diyCell.selectionLayer.isHidden = true
+            diyCell?.selectionLayer.isHidden = true
             return
         }
-        diyCell.selectionLayer.isHidden = false
-        diyCell.selectionType = selectionType
+        diyCell?.selectionLayer.isHidden = false
+        diyCell?.selectionType = selectionType
     }
 }
