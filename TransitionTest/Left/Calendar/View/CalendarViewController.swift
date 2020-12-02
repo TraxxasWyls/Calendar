@@ -8,12 +8,11 @@
 import Foundation
 import FSCalendar
 
-class CalendarViewController: UIViewController {
+// MARK: - CalendarViewController
 
-    // MARK: - Properties
+final class CalendarViewController: UIViewController {
 
-    /// FSCalendar instance
-    private var calendar = FSCalendar()
+    // MARK: - Condition
 
     /// State of boundary dates of the selected segment
     private enum Condition {
@@ -22,6 +21,11 @@ class CalendarViewController: UIViewController {
         case shouldDeselect
         case shouldSelect
     }
+
+    // MARK: - Properties
+
+    /// FSCalendar instance
+    private var calendar = FSCalendar()
 
     /// State of the left border of the selected segment
     private var ConditionOfFirstDate: Condition = .didDeselect

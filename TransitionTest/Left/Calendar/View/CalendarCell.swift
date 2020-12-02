@@ -9,9 +9,11 @@ import Foundation
 import UIKit
 import FSCalendar
 
-class CalendarCell: FSCalendarCell {
+// MARK: - CalendarCell
 
-    var selectionLayer = CAShapeLayer()
+final class CalendarCell: FSCalendarCell {
+
+    // MARK: - SelectionType
 
     enum SelectionType: Int {
         case none
@@ -20,12 +22,20 @@ class CalendarCell: FSCalendarCell {
         case middle
         case rightBorder
     }
-    
+
+    // MARK: - Properties
+
+    /// Selection layer instance
+    var selectionLayer = CAShapeLayer()
+
+    /// Current cell selection type
     var selectionType: SelectionType = .none {
         didSet {
             setNeedsLayout()
         }
     }
+
+    // MARK: - Initializers
     
     required init?(coder aDecoder: NSCoder?) {
         fatalError("init(coder:) has not been implemented")
@@ -38,25 +48,28 @@ class CalendarCell: FSCalendarCell {
         configureShapeLayer()
     }
 
-    func configureSelecitonLayer() {
+    // MARK: - Private
+
+    private func configureSelecitonLayer() {
         selectionLayer.fillColor = UIColor.red.withAlphaComponent(0.7).cgColor
         selectionLayer.actions = ["hidden": NSNull()]
     }
 
-    func configureShapeLayer() {
+    private func configureShapeLayer() {
         shapeLayer.isHidden = true
     }
+
+    // MARK: - FSCalendarCell
 
     override func layoutSubviews() {
         super.layoutSubviews()
         backgroundView?.frame = bounds.insetBy(dx: 1, dy: 1)
         selectionLayer.frame = contentView.bounds
-        
-        if selectionType == .middle {
+        switch selectionType {
+        case .middle:
             selectionLayer.path = UIBezierPath(rect: selectionLayer.bounds).cgPath
-        }
-        else if selectionType == .leftBorder {
-            self.selectionLayer.path = UIBezierPath(
+        case .leftBorder:
+            selectionLayer.path = UIBezierPath(
                 roundedRect: selectionLayer.bounds,
                 byRoundingCorners: [.topLeft, .bottomLeft],
                 cornerRadii: CGSize(
@@ -64,8 +77,7 @@ class CalendarCell: FSCalendarCell {
                     height: selectionLayer.frame.width / 2
                 )
             ).cgPath
-        }
-        else if selectionType == .rightBorder {
+        case .rightBorder:
             self.selectionLayer.path = UIBezierPath(
                 roundedRect: selectionLayer.bounds,
                 byRoundingCorners: [.topRight, .bottomRight],
@@ -74,8 +86,7 @@ class CalendarCell: FSCalendarCell {
                     height: selectionLayer.frame.width / 2
                 )
             ).cgPath
-        }
-        else if selectionType == .single {
+        case .single:
             let diameter: CGFloat = min(selectionLayer.frame.height, selectionLayer.frame.width)
             self.selectionLayer.path = UIBezierPath(
                 ovalIn: CGRect(
@@ -84,14 +95,8 @@ class CalendarCell: FSCalendarCell {
                     width: diameter, height: diameter
                 )
             ).cgPath
-        }
-    }
-    
-    override func configureAppearance() {
-        super.configureAppearance()
-        if self.isPlaceholder {
-            self.eventIndicator.isHidden = true
-            self.titleLabel.textColor = UIColor.lightGray
+        default:
+            return
         }
     }
 }
