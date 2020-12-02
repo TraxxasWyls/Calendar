@@ -24,6 +24,9 @@ final class CalendarViewController: UIViewController {
 
     // MARK: - Properties
 
+    /// HapticFeedback instance
+    private let hapticFeedback = HapticFeedback()
+
     /// FSCalendar instance
     private var calendar = FSCalendar()
 
@@ -36,8 +39,9 @@ final class CalendarViewController: UIViewController {
     /// Left date  of the selected segment
     private var firstDate: Date? {
         didSet {
-            if firstDate != nil {
+            if let firstDate = firstDate {
                 ConditionOfFirstDate = .didSelect
+                calendar.setCurrentPage(firstDate, animated: true)
             } else {
                 ConditionOfFirstDate = .didDeselect
             }
@@ -47,15 +51,19 @@ final class CalendarViewController: UIViewController {
     /// Right date of the selected segment
     private var secondDate: Date? {
         didSet {
+            if let secondDate = secondDate {
+                ConditionOfSecondDate = .didSelect
+                calendar.setCurrentPage(secondDate, animated: true)
+            } else {
+                if let firstDate = firstDate {
+                    calendar.setCurrentPage(firstDate, animated: true)
+                }
+                ConditionOfSecondDate = .didDeselect
+            }
             if let secondDate = secondDate,
                let firstDate = firstDate,
                firstDate > secondDate {
                 swap(&self.firstDate, &self.secondDate)
-            }
-            if secondDate != nil {
-                ConditionOfSecondDate = .didSelect
-            } else {
-                ConditionOfSecondDate = .didDeselect
             }
         }
     }
@@ -180,6 +188,7 @@ extension CalendarViewController: FSCalendarDataSource {
 extension CalendarViewController: FSCalendarDelegate {
 
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
+        hapticFeedback.impact(.light)
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
         if calendar.selectedDates.count == 1,
@@ -259,6 +268,7 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
+        hapticFeedback.impact(.medium)
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
         if isFirstDate {
@@ -275,13 +285,13 @@ extension CalendarViewController: FSCalendarDelegate {
             calendar.deselect(secondDate)
             self.firstDate = nil
             self.secondDate = nil
-            self.calendar(calendar,didDeselect: firstDate)
-            self.calendar(calendar,didDeselect: secondDate)
+            configureVisibleCells()
         }
         return true
     }
 
     func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
+        hapticFeedback.impact(.light)
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
         if isFirstDate {

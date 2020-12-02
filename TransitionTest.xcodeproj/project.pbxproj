@@ -51,6 +51,7 @@
 		CB00DBC12572A4B5000CCC11 /* MainModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB942572A4B5000CCC11 /* MainModule.swift */; };
 		CB00DBC32572A4B5000CCC11 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB00DB962572A4B5000CCC11 /* SceneDelegate.swift */; };
 		CB73D1C82575797A0075107B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB73D1C72575797A0075107B /* Date.swift */; };
+		CB73D1DC2577D5420075107B /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB73D1DB2577D5420075107B /* HapticFeedback.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -102,6 +103,7 @@
 		CB00DB962572A4B5000CCC11 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CB455FD22568090C00CF50F1 /* TransitionTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransitionTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB73D1C72575797A0075107B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
+		CB73D1DB2577D5420075107B /* HapticFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		CB88A1F925729C5C0072FE74 /* FSCalendar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FSCalendar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBCF4BBA256E991B000FECE6 /* TransitionHandler.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TransitionHandler.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7FD4B44EE2EDB50404DF102 /* Pods-TransitionTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TransitionTest.release.xcconfig"; path = "Target Support Files/Pods-TransitionTest/Pods-TransitionTest.release.xcconfig"; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				CB00DB8E2572A4B5000CCC11 /* AppDelegate.swift */,
 				CB00DB8F2572A4B5000CCC11 /* Main */,
 				CB00DB952572A4B5000CCC11 /* Info.plist */,
+				CB73D1D92577D5370075107B /* CMUI */,
 				CB00DB962572A4B5000CCC11 /* SceneDelegate.swift */,
 			);
 			path = TransitionTest;
@@ -381,6 +384,22 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		CB73D1D92577D5370075107B /* CMUI */ = {
+			isa = PBXGroup;
+			children = (
+				CB73D1DA2577D5420075107B /* HapticFeedback */,
+			);
+			path = CMUI;
+			sourceTree = "<group>";
+		};
+		CB73D1DA2577D5420075107B /* HapticFeedback */ = {
+			isa = PBXGroup;
+			children = (
+				CB73D1DB2577D5420075107B /* HapticFeedback.swift */,
+			);
+			path = HapticFeedback;
+			sourceTree = "<group>";
+		};
 		CBCF4B2A256DA0BA000FECE6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -534,6 +553,7 @@
 				CB00DBAF2572A4B5000CCC11 /* UIViewController.swift in Sources */,
 				CB00DBC12572A4B5000CCC11 /* MainModule.swift in Sources */,
 				CB00DBA12572A4B5000CCC11 /* MainRouterInput.swift in Sources */,
+				CB73D1DC2577D5420075107B /* HapticFeedback.swift in Sources */,
 				CB00DBA52572A4B5000CCC11 /* CalendarViewController.swift in Sources */,
 				CB00DBA62572A4B5000CCC11 /* LeftModule.swift in Sources */,
 				CB00DBA92572A4B5000CCC11 /* LeftRouterInput.swift in Sources */,
