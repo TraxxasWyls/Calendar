@@ -44,6 +44,9 @@ final class CalendarViewController: UIViewController {
                 calendar.setCurrentPage(firstDate, animated: true)
             } else {
                 ConditionOfFirstDate = .didDeselect
+                if let today = calendar.today {
+                    calendar.setCurrentPage(today, animated: true)
+                }
             }
         }
     }
@@ -268,7 +271,7 @@ extension CalendarViewController: FSCalendarDelegate {
     }
 
     func calendar(_ calendar: FSCalendar, shouldDeselect date: Date, at monthPosition: FSCalendarMonthPosition) -> Bool {
-        hapticFeedback.impact(.medium)
+        hapticFeedback.impact(.heavy)
         let isFirstDate = date == firstDate
         let isSecondDate = date == secondDate
         if isFirstDate {
@@ -287,7 +290,8 @@ extension CalendarViewController: FSCalendarDelegate {
             self.secondDate = nil
             configureVisibleCells()
         }
-        return true
+        self.calendar(calendar,didSelect: date, at: .current)
+        return false
     }
 
     func calendar(_ calendar: FSCalendar, didDeselect date: Date) {
