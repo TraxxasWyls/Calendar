@@ -1,9 +1,8 @@
 //
 //  CalendarCell.swift
-//  FSCalendarSwiftExample
+//  TransitionTest
 //
-//  Created by dingwenchao on 06/11/2016.
-//  Copyright © 2016 wenchao. All rights reserved.
+//  Created by Дмитрий Савинов on 20.11.2020.
 //
 
 import Foundation
@@ -95,5 +94,4 @@ class CalendarCell: FSCalendarCell {
             self.titleLabel.textColor = UIColor.lightGray
         }
     }
-    
 }
