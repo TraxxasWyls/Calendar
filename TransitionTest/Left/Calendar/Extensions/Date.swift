@@ -25,7 +25,7 @@ extension Date {
     public func sideInRange(_ left: Date, _ right: Date) -> Side {
         let center = (right.timeIntervalSince1970 - left.timeIntervalSince1970) / 2
         let left = left.timeIntervalSince1970
-        let current = self.timeIntervalSince1970 - left
+        let current = timeIntervalSince1970 - left
         if current - center < 0 {
             return .left
         }
