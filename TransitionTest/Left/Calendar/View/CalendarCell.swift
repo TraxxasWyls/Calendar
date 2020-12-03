@@ -43,12 +43,35 @@ final class CalendarCell: FSCalendarCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.layer.insertSublayer(selectionLayer, below: self.titleLabel.layer)
+        setupTopBorderOfCell(color: .lightGray, width: 0.5)
+//        let dateLabel = UILabel()
+//        contentView.addSubview(dateLabel)
+//        dateLabel.text = "LOL"
+//        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            dateLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+//            dateLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+//            dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+//            dateLabel.topAnchor.constraint(equalTo: contentView.topAnchor)
+//        ])
+        contentView.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+//        contentView.viw
+//        titleLabel.font = UIFont(name: "Kaiti SC", size: 25.0);
+//        titleLabel.adjustsFontSizeToFitWidth = true
+        contentView.layer.insertSublayer(selectionLayer, below: titleLabel.layer)
         configureSelecitonLayer()
         configureShapeLayer()
     }
 
     // MARK: - Private
+
+    private func setupTopBorderOfCell(color: UIColor, width: CGFloat)  {
+        let layer = CALayer()
+        layer.borderColor = color.withAlphaComponent(0.7).cgColor
+        layer.borderWidth = width
+        layer.frame = CGRect(x: 0, y: 0, width: self.frame.size.width, height: width)
+        self.layer.addSublayer(layer)
+    }
 
     private func configureSelecitonLayer() {
         selectionLayer.fillColor = UIColor.red.withAlphaComponent(0.7).cgColor
@@ -64,7 +87,13 @@ final class CalendarCell: FSCalendarCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         backgroundView?.frame = bounds.insetBy(dx: 1, dy: 1)
-        selectionLayer.frame = contentView.bounds
+        let selectionLayerRect = CGRect(x: contentView.frame.origin.x,
+                                        y: contentView.frame.origin.y,
+                                        width: contentView.frame.width,
+                                        height: contentView.frame.height - 15
+          )
+        selectionLayer.frame = selectionLayerRect
+
         switch selectionType {
         case .middle:
             selectionLayer.path = UIBezierPath(rect: selectionLayer.bounds).cgPath

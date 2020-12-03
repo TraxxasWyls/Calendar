@@ -30,6 +30,9 @@ final class CalendarViewController: UIViewController {
     /// FSCalendar instance
     private var calendar = FSCalendar()
 
+    /// Weak Day View for calendar
+    private var weakDayView: UIView?
+
     /// State of the left border of the selected segment
     private var ConditionOfFirstDate: Condition = .didDeselect
 
@@ -77,6 +80,7 @@ final class CalendarViewController: UIViewController {
         super.viewDidLoad()
         configureView()
         configureCalendar()
+        configureCalendarAppereance()
         configureNavigation()
         setupCalendar(dataSource: self, delegate: self)
         view.addSubview(calendar)
@@ -92,7 +96,6 @@ final class CalendarViewController: UIViewController {
         calendar.firstWeekday = 2
         calendar.placeholderType = .none
         calendar.calendarHeaderView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
-        calendar.calendarWeekdayView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
         calendar.appearance.eventSelectionColor = UIColor.red
         calendar.register(CalendarCell.self, forCellReuseIdentifier: "cell")
         calendar.swipeToChooseGesture.isEnabled = true
@@ -101,11 +104,39 @@ final class CalendarViewController: UIViewController {
             action: #selector(calendar.handleScopeGesture(_:))
         )
         calendar.addGestureRecognizer(scopeGesture)
+        calendar.calendarWeekdayView.backgroundColor = .tertiarySystemGroupedBackground
+//        calendar.calendarWeekdayView.
+//
+//        weakDayView = FSCalendarCaseOptions.weekdayUsesSingleUpperCase
+
+            // calendar.weekdayHeight = 0
+//        calendar.calendarWeekdayView.removeFromSuperview()
+//        calendar.calendarWeekdayView.delete(nil)
+
+    }
+
+    private func configureCalendarAppereance() {
+        calendar.appearance.titleFont = UIFont(name: "Helvetica", size: 18);
+        calendar.appearance.caseOptions = .weekdayUsesSingleUpperCase
+        calendar.appearance.titleOffset = CGPoint(x: 0, y: 4)
+        calendar.rowHeight = 50
+        calendar.appearance.headerTitleFont = UIFont(name: "Helvetica", size: 18);
+        calendar.appearance.headerTitleOffset = CGPoint(x: 0, y: -10)
     }
 
     private func configureNavigation() {
         let todayItem = UIBarButtonItem(title: "Today", style: .plain, target: self, action: #selector(todayItemClicked(sender:)))
         navigationItem.rightBarButtonItem = todayItem
+        if let navigationController = navigationController,
+           let weakDayView = weakDayView {
+            navigationController.navigationBar.frame = CGRect(
+                x: 0,
+                y: navigationController.navigationBar.frame.midY,
+                width: view.frame.size.width,
+                height: navigationController.navigationBar.frame.height + weakDayView.fs_height + 5
+            )
+            navigationController.navigationBar.addSubview(weakDayView)
+        }
     }
 
     private func configureView() {
@@ -312,4 +343,10 @@ extension CalendarViewController: FSCalendarDelegate {
 // MARK:- FSCalendarDelegateAppearance
 
 extension CalendarViewController: FSCalendarDelegateAppearance {
+}
+
+extension FSCalendarWeekdayView {
+    func configureAppearance() {
+        self.removeFromSuperview()
+    }
 }

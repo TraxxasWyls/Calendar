@@ -19,7 +19,10 @@ class ViewController: UIViewController {
     @IBAction func left(_ sender: Any) {
 //        router.openLeft(with: "self.description")
         let navigationController = UINavigationController(rootViewController: CalendarViewController())
+//        navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)
+        
+
     }
 
     @IBAction func center(_ sender: Any) {

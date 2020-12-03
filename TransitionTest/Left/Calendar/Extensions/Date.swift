@@ -8,18 +8,18 @@
 import Foundation
 
 extension Date {
+
+    public enum Side {
+        case left
+        case right
+        case center
+    }
     
     public func isInRange(_ left: Date, _ right: Date) -> Bool {
         if (self < right && self > left) {
             return true
         }
         return false
-    }
-
-    public enum Side {
-        case left
-        case right
-        case center
     }
 
     public func sideInRange(_ left: Date, _ right: Date) -> Side {
