@@ -88,31 +88,41 @@ final class CalendarCell: FSCalendarCell {
         super.layoutSubviews()
         backgroundView?.frame = bounds.insetBy(dx: 1, dy: 1)
         let selectionLayerRect = CGRect(x: contentView.frame.origin.x,
-                                        y: contentView.frame.origin.y,
+                                        y: contentView.frame.origin.y + 7.5,
                                         width: contentView.frame.width,
                                         height: contentView.frame.height - 15
           )
+        let selectionLayerLeftEdge = CGRect(x: contentView.frame.origin.x + 7,
+                                        y: contentView.frame.origin.y + 7.5,
+                                        width: contentView.frame.width - 7,
+                                        height: contentView.frame.height - 15
+          )
+        let selectionLayerRightEdge = CGRect(x: contentView.frame.origin.x,
+                                        y: contentView.frame.origin.y + 7.5,
+                                        width: contentView.frame.width - 7,
+                                        height: contentView.frame.height - 15
+          )
         selectionLayer.frame = selectionLayerRect
-
+        selectionLayer.bounds = selectionLayerRect
         switch selectionType {
         case .middle:
             selectionLayer.path = UIBezierPath(rect: selectionLayer.bounds).cgPath
         case .leftBorder:
             selectionLayer.path = UIBezierPath(
-                roundedRect: selectionLayer.bounds,
+                roundedRect: selectionLayerLeftEdge,
                 byRoundingCorners: [.topLeft, .bottomLeft],
                 cornerRadii: CGSize(
-                    width: selectionLayer.frame.width / 2,
-                    height: selectionLayer.frame.width / 2
+                    width: selectionLayer.frame.height / 2,
+                    height: selectionLayer.frame.height / 2
                 )
             ).cgPath
         case .rightBorder:
             self.selectionLayer.path = UIBezierPath(
-                roundedRect: selectionLayer.bounds,
+                roundedRect: selectionLayerRightEdge,
                 byRoundingCorners: [.topRight, .bottomRight],
                 cornerRadii: CGSize(
-                    width: selectionLayer.frame.width / 2,
-                    height: selectionLayer.frame.width / 2
+                    width: selectionLayer.frame.height / 2,
+                    height: selectionLayer.frame.height / 2
                 )
             ).cgPath
         case .single:
