@@ -44,21 +44,8 @@ final class CalendarCell: FSCalendarCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupTopBorderOfCell(color: .lightGray, width: 0.5)
-//        let dateLabel = UILabel()
-//        contentView.addSubview(dateLabel)
-//        dateLabel.text = "LOL"
-//        dateLabel.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            dateLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor),
-//            dateLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-//            dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-//            dateLabel.topAnchor.constraint(equalTo: contentView.topAnchor)
-//        ])
-        contentView.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-//        contentView.viw
-//        titleLabel.font = UIFont(name: "Kaiti SC", size: 25.0);
-//        titleLabel.adjustsFontSizeToFitWidth = true
         contentView.layer.insertSublayer(selectionLayer, below: titleLabel.layer)
+        contentView.layer.insertSublayer(shapeLayer, below: selectionLayer)
         configureSelecitonLayer()
         configureShapeLayer()
     }
@@ -69,17 +56,17 @@ final class CalendarCell: FSCalendarCell {
         let layer = CALayer()
         layer.borderColor = color.withAlphaComponent(0.7).cgColor
         layer.borderWidth = width
-        layer.frame = CGRect(x: 0, y: 0, width: self.frame.size.width, height: width)
+        layer.frame = CGRect(x: 0, y: -4, width: self.frame.size.width, height: width)
         self.layer.addSublayer(layer)
     }
 
     private func configureSelecitonLayer() {
-        selectionLayer.fillColor = UIColor.red.withAlphaComponent(0.7).cgColor
+        selectionLayer.fillColor = UIColor.red.cgColor
         selectionLayer.actions = ["hidden": NSNull()]
     }
 
     private func configureShapeLayer() {
-        shapeLayer.isHidden = true
+        shapeLayer.isHidden = false
     }
 
     // MARK: - FSCalendarCell
@@ -88,19 +75,19 @@ final class CalendarCell: FSCalendarCell {
         super.layoutSubviews()
         backgroundView?.frame = bounds.insetBy(dx: 1, dy: 1)
         let selectionLayerRect = CGRect(x: contentView.frame.origin.x,
-                                        y: contentView.frame.origin.y + 7.5,
+                                        y: shapeLayer.frame.origin.y,
                                         width: contentView.frame.width,
-                                        height: contentView.frame.height - 15
+                                        height: shapeLayer.frame.height
           )
         let selectionLayerLeftEdge = CGRect(x: contentView.frame.origin.x + 7,
-                                        y: contentView.frame.origin.y + 7.5,
+                                            y: shapeLayer.frame.origin.y,
                                         width: contentView.frame.width - 7,
-                                        height: contentView.frame.height - 15
+                                        height: shapeLayer.frame.height
           )
         let selectionLayerRightEdge = CGRect(x: contentView.frame.origin.x,
-                                        y: contentView.frame.origin.y + 7.5,
+                                             y: shapeLayer.frame.origin.y,
                                         width: contentView.frame.width - 7,
-                                        height: contentView.frame.height - 15
+                                        height: shapeLayer.frame.height
           )
         selectionLayer.frame = selectionLayerRect
         selectionLayer.bounds = selectionLayerRect

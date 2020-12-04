@@ -96,29 +96,21 @@ final class CalendarViewController: UIViewController {
         calendar.firstWeekday = 2
         calendar.placeholderType = .none
         calendar.calendarHeaderView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
-        calendar.appearance.eventSelectionColor = UIColor.red
         calendar.register(CalendarCell.self, forCellReuseIdentifier: "cell")
         calendar.swipeToChooseGesture.isEnabled = true
+        calendar.appearance.selectionColor = UIColor.red
         let scopeGesture = UIPanGestureRecognizer(
             target: calendar,
             action: #selector(calendar.handleScopeGesture(_:))
         )
         calendar.addGestureRecognizer(scopeGesture)
         calendar.calendarWeekdayView.backgroundColor = .tertiarySystemGroupedBackground
-//        calendar.calendarWeekdayView.
-//
-//        weakDayView = FSCalendarCaseOptions.weekdayUsesSingleUpperCase
-
-            // calendar.weekdayHeight = 0
-//        calendar.calendarWeekdayView.removeFromSuperview()
-//        calendar.calendarWeekdayView.delete(nil)
-
     }
 
     private func configureCalendarAppereance() {
         calendar.appearance.titleFont = UIFont(name: "Helvetica", size: 18);
         calendar.appearance.caseOptions = .weekdayUsesSingleUpperCase
-        calendar.appearance.titleOffset = CGPoint(x: 0, y: 4)
+        calendar.appearance.titleOffset = CGPoint(x: 0, y: 0)
         calendar.rowHeight = 50
         calendar.appearance.headerTitleFont = UIFont(name: "Helvetica", size: 18);
         calendar.appearance.headerTitleOffset = CGPoint(x: 0, y: -10)
@@ -169,16 +161,10 @@ final class CalendarViewController: UIViewController {
     /// Selection layer configuration for calendar cells
     private func configure(cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         let diyCell = (cell as? CalendarCell)
-        let isFirstDate = date == firstDate
-        let isSecondDate = date == secondDate
         var selectionType = CalendarCell.SelectionType.none
-        if isFirstDate || isSecondDate
-            || date == calendar.today {
-            selectionType = .single
-        }
         if let secondDate = secondDate,
            let firstDate = firstDate {
-            if  date.isInRange(firstDate, secondDate){
+            if date.isInRange(firstDate, secondDate){
                 selectionType = .middle
             }
             if calendar.selectedDates.contains(date) {
@@ -343,9 +329,33 @@ extension CalendarViewController: FSCalendarDelegate {
 // MARK:- FSCalendarDelegateAppearance
 
 extension CalendarViewController: FSCalendarDelegateAppearance {
+
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, fillSelectionColorFor date: Date) -> UIColor? {
+        if date == calendar.today {
+            return UIColor.red
+        }
+        return nil
+    }
+
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, fillDefaultColorFor date: Date) -> UIColor? {
+        if date == calendar.today {
+            print("opana")
+            return UIColor.blue
+        }
+        return nil
+    }
+
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
+        UIColor.systemGray
+    }
+
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleSelectionColorFor date: Date) -> UIColor? {
+        UIColor.systemBackground
+    }
 }
 
 extension FSCalendarWeekdayView {
+
     func configureAppearance() {
         self.removeFromSuperview()
     }
