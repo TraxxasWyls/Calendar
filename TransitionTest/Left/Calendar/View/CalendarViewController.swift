@@ -24,6 +24,8 @@ final class CalendarViewController: UIViewController {
 
     // MARK: - Properties
 
+//    private let gregorian = Calendar(identifier: .gregorian)
+
     /// HapticFeedback instance
     private let hapticFeedback = HapticFeedback()
 
@@ -67,12 +69,19 @@ final class CalendarViewController: UIViewController {
                 ConditionOfSecondDate = .didDeselect
             }
             if let secondDate = secondDate,
-               let firstDate = firstDate,
-               firstDate > secondDate {
-                swap(&self.firstDate, &self.secondDate)
+               let firstDate = firstDate {
+                if firstDate > secondDate {
+                    swap(&self.firstDate, &self.secondDate)
+                }
+//                range.forEach { (date) in
+//                    calendar(calendar, appearance: calendar.appearance, fillDefaultColorFor: date)
+//                }
+                calendar.configureAppearance()
             }
         }
     }
+
+    private var range = [Date]()
 
     // MARK: - ViewController
 
@@ -98,27 +107,31 @@ final class CalendarViewController: UIViewController {
         calendar.calendarHeaderView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
         calendar.register(CalendarCell.self, forCellReuseIdentifier: "cell")
         calendar.swipeToChooseGesture.isEnabled = true
-        calendar.appearance.selectionColor = UIColor.red
         let scopeGesture = UIPanGestureRecognizer(
             target: calendar,
             action: #selector(calendar.handleScopeGesture(_:))
         )
         calendar.addGestureRecognizer(scopeGesture)
-        calendar.calendarWeekdayView.backgroundColor = .tertiarySystemGroupedBackground
     }
 
     private func configureCalendarAppereance() {
         calendar.appearance.titleFont = UIFont(name: "Helvetica", size: 18);
         calendar.appearance.caseOptions = .weekdayUsesSingleUpperCase
-        calendar.appearance.titleOffset = CGPoint(x: 0, y: 0)
         calendar.rowHeight = 50
-        calendar.appearance.headerTitleFont = UIFont(name: "Helvetica", size: 18);
-        calendar.appearance.headerTitleOffset = CGPoint(x: 0, y: -10)
+        calendar.appearance.headerTitleFont = UIFont(name: "Helvetica-Bold", size: 18);
+        calendar.appearance.headerTitleColor = UIColor.red
+        calendar.appearance.weekdayTextColor = UIColor.gray
+        calendar.appearance.weekdayFont = UIFont(name: "Helvetica", size: 12);
+        calendar.weekdayHeight = 0
+        calendar.appearance.selectionColor = UIColor.red
+        calendar.appearance.separators = .interRows
+        calendar.appearance.titleOffset = CGPoint(x: 0, y: 4)
     }
 
     private func configureNavigation() {
         let todayItem = UIBarButtonItem(title: "Today", style: .plain, target: self, action: #selector(todayItemClicked(sender:)))
         navigationItem.rightBarButtonItem = todayItem
+        navigationItem.rightBarButtonItem?.tintColor = UIColor.red
         if let navigationController = navigationController,
            let weakDayView = weakDayView {
             navigationController.navigationBar.frame = CGRect(
@@ -166,6 +179,7 @@ final class CalendarViewController: UIViewController {
            let firstDate = firstDate {
             if date.isInRange(firstDate, secondDate){
                 selectionType = .middle
+                diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
             }
             if calendar.selectedDates.contains(date) {
                 if date == firstDate {
@@ -176,7 +190,14 @@ final class CalendarViewController: UIViewController {
                 }
             }
         }
+       print( calendar.selectedDates.count)
         if selectionType == .none {
+            if calendar.selectedDates.count == 1,
+               calendar.selectedDates.contains(date) {
+                diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleSelectionColorFor: date)
+            } else {
+                diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
+            }
             diyCell?.selectionLayer.isHidden = true
             return
         }
@@ -187,6 +208,16 @@ final class CalendarViewController: UIViewController {
     @objc private func todayItemClicked(sender: AnyObject) {
         calendar.setCurrentPage(Date(), animated: true)
     }
+
+//    func createRangeOfDates(firstDate: Date, secondDate: Date) -> [Date] {
+//        var range = [Date]()
+//        var nextDate = firstDate
+//        while (nextDate != secondDate) {
+//            range.append(nextDate)
+//            nextDate = gregorian.date(byAdding: .day, value: 1, to: nextDate) ?? Date()
+//        }
+//        return range
+//    }
 }
 
 // MARK: - FSCalendarDataSource
@@ -201,6 +232,7 @@ extension CalendarViewController: FSCalendarDataSource {
     func calendar(_ calendar: FSCalendar, willDisplay cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         configure(cell: cell, for: date, at: position)
     }
+
 }
 
 // MARK: - FSCalendarDelegate
@@ -331,26 +363,31 @@ extension CalendarViewController: FSCalendarDelegate {
 extension CalendarViewController: FSCalendarDelegateAppearance {
 
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, fillSelectionColorFor date: Date) -> UIColor? {
+        return UIColor.black
+    }
+
+    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, fillDefaultColorFor date: Date) -> UIColor? {
         if date == calendar.today {
             return UIColor.red
         }
         return nil
     }
 
-    func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, fillDefaultColorFor date: Date) -> UIColor? {
-        if date == calendar.today {
-            print("opana")
-            return UIColor.blue
-        }
-        return nil
-    }
-
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleDefaultColorFor date: Date) -> UIColor? {
-        UIColor.systemGray
+        if date != calendar.today {
+            if let firstDate = firstDate,
+               let secondDate = secondDate {
+                if date.isInRange(firstDate, secondDate) {
+                    return UIColor.white
+                }
+            }
+            return UIColor.black
+        }
+        return UIColor.white
     }
 
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleSelectionColorFor date: Date) -> UIColor? {
-        UIColor.systemBackground
+        UIColor.white
     }
 }
 

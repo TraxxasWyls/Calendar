@@ -43,7 +43,7 @@ final class CalendarCell: FSCalendarCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupTopBorderOfCell(color: .lightGray, width: 0.5)
+//        setupTopBorderOfCell(color: .lightGray, width: 0.5)
         contentView.layer.insertSublayer(selectionLayer, below: titleLabel.layer)
         contentView.layer.insertSublayer(shapeLayer, below: selectionLayer)
         configureSelecitonLayer()
@@ -61,12 +61,18 @@ final class CalendarCell: FSCalendarCell {
     }
 
     private func configureSelecitonLayer() {
-        selectionLayer.fillColor = UIColor.red.cgColor
+        selectionLayer.fillColor = UIColor.black.withAlphaComponent(0.8).cgColor
         selectionLayer.actions = ["hidden": NSNull()]
     }
 
     private func configureShapeLayer() {
         shapeLayer.isHidden = false
+        shapeLayer.fillColor = UIColor.black.cgColor
+        shapeLayer.frame = CGRect(x: shapeLayer.frame.origin.x,
+                                  y: shapeLayer.frame.origin.y + 10,
+                                  width: shapeLayer.frame.width,
+                                  height:shapeLayer.frame.height
+        )
     }
 
     // MARK: - FSCalendarCell
@@ -112,15 +118,15 @@ final class CalendarCell: FSCalendarCell {
                     height: selectionLayer.frame.height / 2
                 )
             ).cgPath
-        case .single:
-            let diameter: CGFloat = min(selectionLayer.frame.height, selectionLayer.frame.width)
-            self.selectionLayer.path = UIBezierPath(
-                ovalIn: CGRect(
-                    x: contentView.frame.width / 2 - diameter / 2,
-                    y: contentView.frame.height / 2 - diameter / 2,
-                    width: diameter, height: diameter
-                )
-            ).cgPath
+//        case .single:
+//            let diameter: CGFloat = min(selectionLayer.frame.height, selectionLayer.frame.width)
+//            self.selectionLayer.path = UIBezierPath(
+//                ovalIn: CGRect(
+//                    x: contentView.frame.width / 2 - diameter / 2,
+//                    y: contentView.frame.height / 2 - diameter / 2,
+//                    width: diameter, height: diameter
+//                )
+//            ).cgPath
         default:
             return
         }
