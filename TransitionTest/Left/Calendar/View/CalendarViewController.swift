@@ -90,6 +90,8 @@ final class CalendarViewController: UIViewController {
 
     private var range = [Date]()
 
+    private var dataWithLenghtOfLayer = [Date: Int]()
+
     // MARK: - ViewController
 
     override func viewDidLoad() {
@@ -184,17 +186,16 @@ final class CalendarViewController: UIViewController {
             if date.isInRange(firstDate, secondDate){
                 selectionType = .middle
                 diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
-                if calendar.selectedDates.contains(date) {
-                    if date == firstDate {
-                        selectionType = .leftBorder
-                    }
-                    if date == secondDate {
-                        selectionType = .rightBorder
-                    }
+            }
+            if calendar.selectedDates.contains(date),
+               let position = diyCell?.monthPosition {
+                if date == firstDate {
+                    print("FIRST", date)
+                    print(getLenghtOfSelectionLayerForFirstLine(date: date, range: range, at: position))
                 }
-                if let position = diyCell?.monthPosition {
-                    print(date)
-                    print(getLenghtOfSelectionLayer(date: date, range: range, at: position))
+                if date == secondDate {
+                    print("SECOND", date)
+                    print(getLenghtOfSelectionLayerForLastLine(date: date, range: range, at: position))
                 }
             }
         }
@@ -236,7 +237,7 @@ final class CalendarViewController: UIViewController {
         return range
     }
 
-    func getLenghtOfSelectionLayer(date: Date,
+    func getLenghtOfSelectionLayerForFirstLine(date: Date,
                                    range: [Date],
                                    at position: FSCalendarMonthPosition
     ) -> Int {
@@ -250,19 +251,42 @@ final class CalendarViewController: UIViewController {
                 }
             }
         }
-        if isAfterFirst(date: date) {
-            if range.count > 7 {
-                subRange = createRangeOfDates(firstDate: range[0], secondDate: range[7])
-            } else if range.count > 2 {
-                subRange = createRangeOfDates(firstDate: range[0], secondDate: range[range.count - 1])
-            }
+        if range.count > 7 {
+            subRange = createRangeOfDates(firstDate: range[0], secondDate: range[7])
+        } else if range.count > 1 {
+            subRange = createRangeOfDates(firstDate: range[0], secondDate: range[range.count - 1])
         }
         if isOnOneRow(cells: cellsOfSubRange) {
-            return cellsOfSubRange.count - 2
+            return cellsOfSubRange.count
         } else {
-
+            return indexOfLastElementOnRow(cells: cellsOfSubRange)
         }
-        return 0;
+    }
+
+    func getLenghtOfSelectionLayerForLastLine(date: Date,
+                                   range: [Date],
+                                   at position: FSCalendarMonthPosition
+    ) -> Int {
+        var cellsOfSubRange = [CalendarCell]()
+        var subRange: [Date] = [Date]() {
+            didSet {
+                subRange.forEach {
+                    if let cell = calendar.cell(for: $0, at: position) as? CalendarCell {
+                        cellsOfSubRange.append(cell)
+                    }
+                }
+            }
+        }
+        if range.count > 7 {
+            subRange = createRangeOfDates(firstDate: range[range.count - 8], secondDate: range[range.count - 1])
+        } else if range.count > 1 {
+            subRange = createRangeOfDates(firstDate: range[0], secondDate: range[range.count - 1])
+        }
+        if isOnOneRow(cells: cellsOfSubRange) {
+            return 0
+        } else {
+            return indexOfFirstElementOnRow(cells: cellsOfSubRange)
+        }
     }
 
     func isOnOneRow(cells: [CalendarCell]) -> Bool {
@@ -280,6 +304,28 @@ final class CalendarViewController: UIViewController {
             return true
         }
         return false
+    }
+
+    func indexOfLastElementOnRow(cells: [CalendarCell]) -> Int {
+        var i = 1
+        for index in 0..<cells.count - 1 {
+            if cells[index].frame.origin.y != cells[i].frame.origin.y {
+                return i
+            }
+            i += 1
+        }
+        return -1
+    }
+
+    func indexOfFirstElementOnRow(cells: [CalendarCell]) -> Int {
+        var i = cells.count - 2
+        for index in stride(from: cells.count - 1, to: 0, by: -1)  {
+            if cells[index].frame.origin.y != cells[i].frame.origin.y {
+                return cells.count - 1 - i
+            }
+            i -= 1
+        }
+        return -1
     }
 }
 
