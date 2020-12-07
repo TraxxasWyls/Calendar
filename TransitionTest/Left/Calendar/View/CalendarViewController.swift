@@ -192,10 +192,12 @@ final class CalendarViewController: UIViewController {
                 if date == firstDate {
                     print("FIRST", date)
                     print(getLenghtOfSelectionLayerForFirstLine(date: date, range: range, at: position))
+                    selectionType = .leftBorder
                 }
                 if date == secondDate {
                     print("SECOND", date)
                     print(getLenghtOfSelectionLayerForLastLine(date: date, range: range, at: position))
+                    selectionType = .rightBorder
                 }
             }
         }
@@ -501,12 +503,5 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
 
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, titleSelectionColorFor date: Date) -> UIColor? {
         UIColor.white
-    }
-}
-
-extension FSCalendarWeekdayView {
-
-    func configureAppearance() {
-        self.removeFromSuperview()
     }
 }
