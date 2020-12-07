@@ -43,9 +43,10 @@ final class CalendarCell: FSCalendarCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-//        setupTopBorderOfCell(color: .lightGray, width: 0.5)
+        setupTopBorderOfCell(color: .lightGray, width: 0.5)
         contentView.layer.insertSublayer(selectionLayer, below: titleLabel.layer)
         contentView.layer.insertSublayer(shapeLayer, below: selectionLayer)
+        contentView.layer.borderColor = .none
         configureSelecitonLayer()
         configureShapeLayer()
     }
@@ -68,11 +69,6 @@ final class CalendarCell: FSCalendarCell {
     private func configureShapeLayer() {
         shapeLayer.isHidden = false
         shapeLayer.fillColor = UIColor.black.cgColor
-        shapeLayer.frame = CGRect(x: shapeLayer.frame.origin.x,
-                                  y: shapeLayer.frame.origin.y + 10,
-                                  width: shapeLayer.frame.width,
-                                  height:shapeLayer.frame.height
-        )
     }
 
     // MARK: - FSCalendarCell

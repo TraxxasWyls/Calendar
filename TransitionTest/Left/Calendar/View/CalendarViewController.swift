@@ -73,9 +73,6 @@ final class CalendarViewController: UIViewController {
                 if firstDate > secondDate {
                     swap(&self.firstDate, &self.secondDate)
                 }
-//                range.forEach { (date) in
-//                    calendar(calendar, appearance: calendar.appearance, fillDefaultColorFor: date)
-//                }
                 calendar.configureAppearance()
             }
         }
@@ -104,7 +101,6 @@ final class CalendarViewController: UIViewController {
         calendar.pagingEnabled = false
         calendar.firstWeekday = 2
         calendar.placeholderType = .none
-        calendar.calendarHeaderView.backgroundColor = UIColor.lightGray.withAlphaComponent(0.1)
         calendar.register(CalendarCell.self, forCellReuseIdentifier: "cell")
         calendar.swipeToChooseGesture.isEnabled = true
         let scopeGesture = UIPanGestureRecognizer(
@@ -122,10 +118,10 @@ final class CalendarViewController: UIViewController {
         calendar.appearance.headerTitleColor = UIColor.red
         calendar.appearance.weekdayTextColor = UIColor.gray
         calendar.appearance.weekdayFont = UIFont(name: "Helvetica", size: 12);
-        calendar.weekdayHeight = 0
+        calendar.weekdayHeight = 18
         calendar.appearance.selectionColor = UIColor.red
-        calendar.appearance.separators = .interRows
-        calendar.appearance.titleOffset = CGPoint(x: 0, y: 4)
+//        calendar.appearance.separators = .interRows
+        calendar.appearance.titleOffset = CGPoint(x: 0, y: 0)
     }
 
     private func configureNavigation() {
@@ -190,6 +186,10 @@ final class CalendarViewController: UIViewController {
                 }
             }
         }
+        if date == calendar.today,
+           !calendar.selectedDates.contains(date) {
+            diyCell?.shapeLayer.fillColor = calendar(calendar, appearance: calendar.appearance, fillDefaultColorFor: date )?.cgColor
+        }
        print( calendar.selectedDates.count)
         if selectionType == .none {
             if calendar.selectedDates.count == 1,
@@ -232,7 +232,6 @@ extension CalendarViewController: FSCalendarDataSource {
     func calendar(_ calendar: FSCalendar, willDisplay cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         configure(cell: cell, for: date, at: position)
     }
-
 }
 
 // MARK: - FSCalendarDelegate
@@ -367,6 +366,11 @@ extension CalendarViewController: FSCalendarDelegateAppearance {
     }
 
     func calendar(_ calendar: FSCalendar, appearance: FSCalendarAppearance, fillDefaultColorFor date: Date) -> UIColor? {
+        if let firstDate = firstDate,
+           let secondDate = secondDate,
+           date.isInRange(firstDate, secondDate) {
+            return nil
+        }
         if date == calendar.today {
             return UIColor.red
         }

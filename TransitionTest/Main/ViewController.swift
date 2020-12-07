@@ -21,8 +21,6 @@ class ViewController: UIViewController {
         let navigationController = UINavigationController(rootViewController: CalendarViewController())
 //        navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)
-        
-
     }
 
     @IBAction func center(_ sender: Any) {
