@@ -24,7 +24,7 @@ final class CalendarViewController: UIViewController {
 
     // MARK: - Properties
 
-//    private let gregorian = Calendar(identifier: .gregorian)
+    private let gregorian = Calendar(identifier: .gregorian)
 
     /// HapticFeedback instance
     private let hapticFeedback = HapticFeedback()
@@ -44,6 +44,14 @@ final class CalendarViewController: UIViewController {
     /// Left date  of the selected segment
     private var firstDate: Date? {
         didSet {
+            if let secondDate = secondDate,
+               let firstDate = firstDate {
+                if firstDate > secondDate {
+                    self.firstDate = secondDate;
+                    self.secondDate = firstDate;
+                }
+                range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
+            }
             if let firstDate = firstDate {
                 ConditionOfFirstDate = .didSelect
                 calendar.setCurrentPage(firstDate, animated: true)
@@ -71,9 +79,11 @@ final class CalendarViewController: UIViewController {
             if let secondDate = secondDate,
                let firstDate = firstDate {
                 if firstDate > secondDate {
-                    swap(&self.firstDate, &self.secondDate)
+                    self.firstDate = secondDate;
+                    self.secondDate = firstDate;
                 }
                 calendar.configureAppearance()
+                range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
             }
         }
     }
@@ -120,8 +130,6 @@ final class CalendarViewController: UIViewController {
         calendar.appearance.weekdayFont = UIFont(name: "Helvetica", size: 12);
         calendar.weekdayHeight = 18
         calendar.appearance.selectionColor = UIColor.red
-//        calendar.appearance.separators = .interRows
-        calendar.appearance.titleOffset = CGPoint(x: 0, y: 0)
     }
 
     private func configureNavigation() {
@@ -176,13 +184,17 @@ final class CalendarViewController: UIViewController {
             if date.isInRange(firstDate, secondDate){
                 selectionType = .middle
                 diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
-            }
-            if calendar.selectedDates.contains(date) {
-                if date == firstDate {
-                    selectionType = .leftBorder
+                if calendar.selectedDates.contains(date) {
+                    if date == firstDate {
+                        selectionType = .leftBorder
+                    }
+                    if date == secondDate {
+                        selectionType = .rightBorder
+                    }
                 }
-                if date == secondDate {
-                    selectionType = .rightBorder
+                if let position = diyCell?.monthPosition {
+                    print(date)
+                    print(getLenghtOfSelectionLayer(date: date, range: range, at: position))
                 }
             }
         }
@@ -190,7 +202,6 @@ final class CalendarViewController: UIViewController {
            !calendar.selectedDates.contains(date) {
             diyCell?.shapeLayer.fillColor = calendar(calendar, appearance: calendar.appearance, fillDefaultColorFor: date )?.cgColor
         }
-       print( calendar.selectedDates.count)
         if selectionType == .none {
             if calendar.selectedDates.count == 1,
                calendar.selectedDates.contains(date) {
@@ -209,15 +220,67 @@ final class CalendarViewController: UIViewController {
         calendar.setCurrentPage(Date(), animated: true)
     }
 
-//    func createRangeOfDates(firstDate: Date, secondDate: Date) -> [Date] {
-//        var range = [Date]()
-//        var nextDate = firstDate
-//        while (nextDate != secondDate) {
-//            range.append(nextDate)
-//            nextDate = gregorian.date(byAdding: .day, value: 1, to: nextDate) ?? Date()
-//        }
-//        return range
-//    }
+    func createRangeOfDates(firstDate: Date, secondDate: Date) -> [Date] {
+        var range = [Date]()
+        var start = firstDate
+        var end = secondDate
+        if firstDate > secondDate {
+            start = secondDate;
+            end = firstDate
+        }
+        var nextDate = start
+        while (nextDate <= end) {
+            range.append(nextDate)
+            nextDate = gregorian.date(byAdding: .day, value: 1, to: nextDate) ?? Date()
+        }
+        return range
+    }
+
+    func getLenghtOfSelectionLayer(date: Date,
+                                   range: [Date],
+                                   at position: FSCalendarMonthPosition
+    ) -> Int {
+        var cellsOfSubRange = [CalendarCell]()
+        var subRange: [Date] = [Date]() {
+            didSet {
+                subRange.forEach {
+                    if let cell = calendar.cell(for: $0, at: position) as? CalendarCell {
+                        cellsOfSubRange.append(cell)
+                    }
+                }
+            }
+        }
+        if isAfterFirst(date: date) {
+            if range.count > 7 {
+                subRange = createRangeOfDates(firstDate: range[0], secondDate: range[7])
+            } else if range.count > 2 {
+                subRange = createRangeOfDates(firstDate: range[0], secondDate: range[range.count - 1])
+            }
+        }
+        if isOnOneRow(cells: cellsOfSubRange) {
+            return cellsOfSubRange.count - 2
+        } else {
+
+        }
+        return 0;
+    }
+
+    func isOnOneRow(cells: [CalendarCell]) -> Bool {
+        if let last = cells.last {
+           return cells.allSatisfy {
+                $0.frame.origin.y == last.frame.origin.y
+            }
+        }
+        return false
+    }
+
+    func isAfterFirst(date: Date) -> Bool {
+        let afterFirst = range[1]
+        if date == afterFirst {
+            return true
+        }
+        return false
+    }
 }
 
 // MARK: - FSCalendarDataSource

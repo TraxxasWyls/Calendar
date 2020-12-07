@@ -23,6 +23,8 @@ final class CalendarCell: FSCalendarCell {
         case rightBorder
     }
 
+    public var lenghtOfSelection = 0;
+
     // MARK: - Properties
 
     /// Selection layer instance
