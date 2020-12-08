@@ -50,7 +50,12 @@ final class CalendarViewController: UIViewController {
                     self.firstDate = secondDate;
                     self.secondDate = firstDate;
                 }
+            }
+            if let secondDate = secondDate,
+               let firstDate = firstDate {
                 range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
+                datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForFirstLine(range: range, at: .current), forKey: firstDate)
+                datesWithLenghtOfLayer = setDatesWithLenghtOfLayer(in: range, from: firstDate, to: secondDate)
             }
             if let firstDate = firstDate {
                 ConditionOfFirstDate = .didSelect
@@ -82,7 +87,9 @@ final class CalendarViewController: UIViewController {
                     self.firstDate = secondDate;
                     self.secondDate = firstDate;
                 }
-                calendar.configureAppearance()
+            }
+            if let secondDate = secondDate,
+               let firstDate = firstDate {
                 range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
                 datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForLastLine(range: range, at: .current), forKey: secondDate)
                 datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForFirstLine(range: range, at: .current), forKey: firstDate)
@@ -358,11 +365,13 @@ final class CalendarViewController: UIViewController {
 
     func indexOfFirstElementOnRow(cells: [CalendarCell]) -> Int {
         var i = cells.count - 2
-        for index in stride(from: cells.count - 1, to: 0, by: -1)  {
-            if cells[index].frame.origin.y != cells[i].frame.origin.y {
-                return cells.count - 1 - i
+        if cells.count > 1 {
+            for index in stride(from: cells.count - 1, to: 0, by: -1)  {
+                if cells[index].frame.origin.y != cells[i].frame.origin.y {
+                    return cells.count - 1 - i
+                }
+                i -= 1
             }
-            i -= 1
         }
         return -1
     }
