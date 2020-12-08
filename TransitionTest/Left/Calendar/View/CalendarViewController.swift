@@ -84,13 +84,17 @@ final class CalendarViewController: UIViewController {
                 }
                 calendar.configureAppearance()
                 range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
+                datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForLastLine(range: range, at: .current), forKey: secondDate)
+                datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForFirstLine(range: range, at: .current), forKey: firstDate)
+                datesWithLenghtOfLayer = setDatesWithLenghtOfLayer(in: range, from: firstDate, to: secondDate)
+                print(datesWithLenghtOfLayer)
             }
         }
     }
 
     private var range = [Date]()
 
-    private var dataWithLenghtOfLayer = [Date: Int]()
+    private var datesWithLenghtOfLayer = [Date: Int]()
 
     // MARK: - ViewController
 
@@ -181,23 +185,34 @@ final class CalendarViewController: UIViewController {
     private func configure(cell: FSCalendarCell, for date: Date, at position: FSCalendarMonthPosition) {
         let diyCell = (cell as? CalendarCell)
         var selectionType = CalendarCell.SelectionType.none
+        diyCell?.removeSelecitonLayer()
         if let secondDate = secondDate,
            let firstDate = firstDate {
-            if date.isInRange(firstDate, secondDate){
+            if date.isInRange(firstDate, secondDate) {
                 selectionType = .middle
                 diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
+                if let lenght = datesWithLenghtOfLayer[date] {
+                    print("MIDLE", date)
+                    print("size of dates: ", datesWithLenghtOfLayer.count)
+                    print(lenght)
+                    diyCell?.lenghtOfSelection = lenght
+                }
             }
             if calendar.selectedDates.contains(date),
                let position = diyCell?.monthPosition {
-                if date == firstDate {
-                    print("FIRST", date)
-                    print(getLenghtOfSelectionLayerForFirstLine(date: date, range: range, at: position))
-                    selectionType = .leftBorder
-                }
-                if date == secondDate {
-                    print("SECOND", date)
-                    print(getLenghtOfSelectionLayerForLastLine(date: date, range: range, at: position))
-                    selectionType = .rightBorder
+                if let lenght = datesWithLenghtOfLayer[date] {
+                    if date == firstDate {
+                        print("FIRST", date)
+                        print(getLenghtOfSelectionLayerForFirstLine(range: range, at: position))
+                        selectionType = .leftBorder
+                        diyCell?.lenghtOfSelection = lenght
+                    }
+                    if date == secondDate {
+                        print("SECOND", date)
+                        print(getLenghtOfSelectionLayerForLastLine(range: range, at: position))
+                        selectionType = .rightBorder
+                        diyCell?.lenghtOfSelection = lenght
+                    }
                 }
             }
         }
@@ -234,12 +249,14 @@ final class CalendarViewController: UIViewController {
         var nextDate = start
         while (nextDate <= end) {
             range.append(nextDate)
-            nextDate = gregorian.date(byAdding: .day, value: 1, to: nextDate) ?? Date()
+            if let date = gregorian.date(byAdding: .day, value: 1, to: nextDate) {
+                nextDate = date
+            }
         }
         return range
     }
 
-    func getLenghtOfSelectionLayerForFirstLine(date: Date,
+    func getLenghtOfSelectionLayerForFirstLine(
                                    range: [Date],
                                    at position: FSCalendarMonthPosition
     ) -> Int {
@@ -265,7 +282,7 @@ final class CalendarViewController: UIViewController {
         }
     }
 
-    func getLenghtOfSelectionLayerForLastLine(date: Date,
+    func getLenghtOfSelectionLayerForLastLine(
                                    range: [Date],
                                    at position: FSCalendarMonthPosition
     ) -> Int {
@@ -291,6 +308,24 @@ final class CalendarViewController: UIViewController {
         }
     }
 
+    func setDatesWithLenghtOfLayer(in range: [Date], from: Date, to: Date) ->  [Date: Int] {
+        let increment = datesWithLenghtOfLayer[from]
+        let decrement = datesWithLenghtOfLayer[to]
+        let lenghtOfRow = 7
+        var datesWithLenghtOfLayer = [Date: Int]()
+        if let increment = increment,
+           let decrement = decrement {
+            if range.count - 2 - decrement > 0 && increment != -1 {
+                for index in stride(from: increment, to: range.count - 2 - decrement, by: +lenghtOfRow) {
+                    datesWithLenghtOfLayer.updateValue(lenghtOfRow, forKey: range[index])
+                }
+            }
+            datesWithLenghtOfLayer.updateValue(increment, forKey: from)
+            datesWithLenghtOfLayer.updateValue(decrement, forKey: to)
+        }
+        return datesWithLenghtOfLayer
+    }
+
     func isOnOneRow(cells: [CalendarCell]) -> Bool {
         if let last = cells.last {
            return cells.allSatisfy {
@@ -310,11 +345,13 @@ final class CalendarViewController: UIViewController {
 
     func indexOfLastElementOnRow(cells: [CalendarCell]) -> Int {
         var i = 1
-        for index in 0..<cells.count - 1 {
-            if cells[index].frame.origin.y != cells[i].frame.origin.y {
-                return i
+        if cells.count > 0 {
+            for index in 0..<cells.count - 1 {
+                if cells[index].frame.origin.y != cells[i].frame.origin.y {
+                    return i
+                }
+                i += 1
             }
-            i += 1
         }
         return -1
     }

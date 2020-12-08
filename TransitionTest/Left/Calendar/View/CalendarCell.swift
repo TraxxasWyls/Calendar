@@ -23,7 +23,7 @@ final class CalendarCell: FSCalendarCell {
         case rightBorder
     }
 
-    public var lenghtOfSelection = 0;
+    public var lenghtOfSelection = 0
 
     // MARK: - Properties
 
@@ -46,8 +46,7 @@ final class CalendarCell: FSCalendarCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupTopBorderOfCell(color: .lightGray, width: 0.5)
-        contentView.layer.insertSublayer(selectionLayer, below: titleLabel.layer)
-        contentView.layer.insertSublayer(shapeLayer, below: selectionLayer)
+        contentView.layer.insertSublayer(shapeLayer, below: titleLabel.layer)
         contentView.layer.borderColor = .none
         configureSelecitonLayer()
         configureShapeLayer()
@@ -73,58 +72,42 @@ final class CalendarCell: FSCalendarCell {
         shapeLayer.fillColor = UIColor.black.cgColor
     }
 
+    func removeSelecitonLayer() {
+//        contentView.layer.sublayers?.removeAll(where: {
+//            $0 == selectionLayer
+//        })
+        lenghtOfSelection = 0
+    }
+
     // MARK: - FSCalendarCell
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        backgroundView?.frame = bounds.insetBy(dx: 1, dy: 1)
-        let selectionLayerRect = CGRect(x: contentView.frame.origin.x,
-                                        y: shapeLayer.frame.origin.y,
-                                        width: contentView.frame.width,
-                                        height: shapeLayer.frame.height
-          )
-        let selectionLayerLeftEdge = CGRect(x: contentView.frame.origin.x + 7,
+        let selectionLayerLeftEdge = CGRect(x: contentView.frame.width/2,
                                             y: shapeLayer.frame.origin.y,
-                                        width: contentView.frame.width - 7,
-                                        height: shapeLayer.frame.height
+                                            width: contentView.frame.width * (CGFloat(lenghtOfSelection)),
+                                            height: shapeLayer.frame.height
           )
-        let selectionLayerRightEdge = CGRect(x: contentView.frame.origin.x,
+        let selectionLayerRightEdge = CGRect(x: contentView.frame.width/2,
                                              y: shapeLayer.frame.origin.y,
-                                        width: contentView.frame.width - 7,
-                                        height: shapeLayer.frame.height
+                                             width: -(contentView.frame.width * CGFloat(lenghtOfSelection)),
+                                             height: shapeLayer.frame.height
           )
-        selectionLayer.frame = selectionLayerRect
-        selectionLayer.bounds = selectionLayerRect
+        let selectionLayerMiddle = CGRect(x: contentView.frame.minX,
+                                          y: shapeLayer.frame.origin.y,
+                                          width: contentView.frame.width * (CGFloat(lenghtOfSelection)),
+                                          height: shapeLayer.frame.height
+          )
         switch selectionType {
         case .middle:
-            selectionLayer.path = UIBezierPath(rect: selectionLayer.bounds).cgPath
+            contentView.layer.insertSublayer(selectionLayer, above: shapeLayer)
+            selectionLayer.path = UIBezierPath(rect: selectionLayerMiddle).cgPath
         case .leftBorder:
-            selectionLayer.path = UIBezierPath(
-                roundedRect: selectionLayerLeftEdge,
-                byRoundingCorners: [.topLeft, .bottomLeft],
-                cornerRadii: CGSize(
-                    width: selectionLayer.frame.height / 2,
-                    height: selectionLayer.frame.height / 2
-                )
-            ).cgPath
+            contentView.layer.insertSublayer(selectionLayer, above: shapeLayer)
+            selectionLayer.path = UIBezierPath(rect: selectionLayerLeftEdge).cgPath
         case .rightBorder:
-            self.selectionLayer.path = UIBezierPath(
-                roundedRect: selectionLayerRightEdge,
-                byRoundingCorners: [.topRight, .bottomRight],
-                cornerRadii: CGSize(
-                    width: selectionLayer.frame.height / 2,
-                    height: selectionLayer.frame.height / 2
-                )
-            ).cgPath
-//        case .single:
-//            let diameter: CGFloat = min(selectionLayer.frame.height, selectionLayer.frame.width)
-//            self.selectionLayer.path = UIBezierPath(
-//                ovalIn: CGRect(
-//                    x: contentView.frame.width / 2 - diameter / 2,
-//                    y: contentView.frame.height / 2 - diameter / 2,
-//                    width: diameter, height: diameter
-//                )
-//            ).cgPath
+            contentView.layer.insertSublayer(selectionLayer, above: shapeLayer)
+            selectionLayer.path = UIBezierPath(rect: selectionLayerRightEdge).cgPath
         default:
             return
         }
