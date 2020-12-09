@@ -83,7 +83,7 @@ final class CalendarCell: FSCalendarCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let selectionLayerLeftEdge = CGRect(x: contentView.frame.width/2,
+        let selectionLayerLeftEdge = CGRect(x: contentView.frame.minX,
                                             y: shapeLayer.frame.origin.y,
                                             width: contentView.frame.width * (CGFloat(lenghtOfSelection)),
                                             height: shapeLayer.frame.height
@@ -104,7 +104,14 @@ final class CalendarCell: FSCalendarCell {
             selectionLayer.path = UIBezierPath(rect: selectionLayerMiddle).cgPath
         case .leftBorder:
             contentView.layer.insertSublayer(selectionLayer, above: shapeLayer)
-            selectionLayer.path = UIBezierPath(rect: selectionLayerLeftEdge).cgPath
+            selectionLayer.path = UIBezierPath(
+                roundedRect: selectionLayerLeftEdge,
+                byRoundingCorners: [.topLeft, .bottomLeft],
+                cornerRadii: CGSize(
+                    width: contentView.frame.height / 2,
+                    height: shapeLayer.frame.height / 2
+                )
+            ).cgPath
         case .rightBorder:
             contentView.layer.insertSublayer(selectionLayer, above: shapeLayer)
             selectionLayer.path = UIBezierPath(rect: selectionLayerRightEdge).cgPath
@@ -113,3 +120,19 @@ final class CalendarCell: FSCalendarCell {
         }
     }
 }
+//selectionLayer.path = UIBezierPath(
+//    roundedRect: selectionLayerLeftEdge,
+//    byRoundingCorners: [.topLeft, .bottomLeft],
+//    cornerRadii: CGSize(
+//        width: selectionLayer.frame.height / 2,
+//        height: selectionLayer.frame.height / 2
+//    )
+//).cgPath
+//self.selectionLayer.path = UIBezierPath(
+//    roundedRect: selectionLayerRightEdge,
+//    byRoundingCorners: [.topRight, .bottomRight],
+//    cornerRadii: CGSize(
+//        width: selectionLayer.frame.height / 2,
+//        height: selectionLayer.frame.height / 2
+//    )
+//).cgPath

@@ -54,12 +54,32 @@ final class CalendarViewController: UIViewController {
             if let secondDate = secondDate,
                let firstDate = firstDate {
                 range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
-                datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForFirstLine(range: range, at: .current), forKey: firstDate)
+                let lenght = getLenghtOfSelectionLayerForFirstLine(range: range, at: .current)
+                datesWithLenghtOfLayer.updateValue(lenght, forKey: firstDate)
                 datesWithLenghtOfLayer = setDatesWithLenghtOfLayer(in: range, from: firstDate, to: secondDate)
+                print("FIRST???")
+                print(datesWithLenghtOfLayer[firstDate])
             }
             if let firstDate = firstDate {
                 ConditionOfFirstDate = .didSelect
                 calendar.setCurrentPage(firstDate, animated: true)
+                if let date = gregorian.date(byAdding: .day, value: 8, to: firstDate) {
+                    let range = createRangeOfDates(firstDate: firstDate, secondDate: date)
+                    let lenghtForNegative = getLenghtOfSelectionLayerForFirstLine(range: range, at: .current)
+                    let lenghtForPositive = getLenghtOfSelectionLayerForFirstLine(range: self.range, at: .current)
+                    let lenght = datesWithLenghtOfLayer[firstDate]
+                    if lenghtForNegative == -1,
+                       let lenght = lenght {
+                        datesWithLenghtOfLayer.updateValue(7-lenght, forKey: firstDate)
+                    } else {
+                        datesWithLenghtOfLayer.updateValue(lenghtForNegative, forKey: firstDate)
+                        if  lenghtForPositive != -1 {
+                            datesWithLenghtOfLayer.updateValue(lenghtForPositive, forKey: firstDate)
+                        }
+                    }
+                    print("FIRST!!!")
+                    print(datesWithLenghtOfLayer[firstDate])
+                }
             } else {
                 ConditionOfFirstDate = .didDeselect
                 if let today = calendar.today {
@@ -94,7 +114,8 @@ final class CalendarViewController: UIViewController {
                 datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForLastLine(range: range, at: .current), forKey: secondDate)
                 datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForFirstLine(range: range, at: .current), forKey: firstDate)
                 datesWithLenghtOfLayer = setDatesWithLenghtOfLayer(in: range, from: firstDate, to: secondDate)
-                print(datesWithLenghtOfLayer)
+                print("SECOND")
+                print(datesWithLenghtOfLayer[secondDate])
             }
         }
     }
@@ -195,31 +216,30 @@ final class CalendarViewController: UIViewController {
         diyCell?.removeSelecitonLayer()
         if let secondDate = secondDate,
            let firstDate = firstDate {
-            if date.isInRange(firstDate, secondDate) {
-                selectionType = .middle
-                diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
-                if let lenght = datesWithLenghtOfLayer[date] {
-                    print("MIDLE", date)
-                    print("size of dates: ", datesWithLenghtOfLayer.count)
-                    print(lenght)
-                    diyCell?.lenghtOfSelection = lenght
-                }
-            }
-            if calendar.selectedDates.contains(date),
-               let position = diyCell?.monthPosition {
+            if calendar.selectedDates.contains(date) {
                 if let lenght = datesWithLenghtOfLayer[date] {
                     if date == firstDate {
                         print("FIRST", date)
-                        print(getLenghtOfSelectionLayerForFirstLine(range: range, at: position))
+                        print(lenght)
                         selectionType = .leftBorder
                         diyCell?.lenghtOfSelection = lenght
                     }
                     if date == secondDate {
                         print("SECOND", date)
-                        print(getLenghtOfSelectionLayerForLastLine(range: range, at: position))
+                        print(lenght)
                         selectionType = .rightBorder
                         diyCell?.lenghtOfSelection = lenght
                     }
+                }
+            }
+            if date.isInRange(firstDate, secondDate) {
+                selectionType = .middle
+                diyCell?.titleLabel.textColor = calendar(calendar, appearance: calendar.appearance, titleDefaultColorFor: date)
+                if let lenght = datesWithLenghtOfLayer[date] {
+//                    print("MIDLE", date)
+//                    print("size of dates: ", datesWithLenghtOfLayer.count)
+//                    print(lenght)
+                    diyCell?.lenghtOfSelection = lenght
                 }
             }
         }
@@ -279,7 +299,7 @@ final class CalendarViewController: UIViewController {
         }
         if range.count > 7 {
             subRange = createRangeOfDates(firstDate: range[0], secondDate: range[7])
-        } else if range.count > 1 {
+        } else if range.count > 0 {
             subRange = createRangeOfDates(firstDate: range[0], secondDate: range[range.count - 1])
         }
         if isOnOneRow(cells: cellsOfSubRange) {
@@ -305,7 +325,7 @@ final class CalendarViewController: UIViewController {
         }
         if range.count > 7 {
             subRange = createRangeOfDates(firstDate: range[range.count - 8], secondDate: range[range.count - 1])
-        } else if range.count > 1 {
+        } else if range.count > 0 {
             subRange = createRangeOfDates(firstDate: range[0], secondDate: range[range.count - 1])
         }
         if isOnOneRow(cells: cellsOfSubRange) {
@@ -322,7 +342,7 @@ final class CalendarViewController: UIViewController {
         var datesWithLenghtOfLayer = [Date: Int]()
         if let increment = increment,
            let decrement = decrement {
-            if range.count - 2 - decrement > 0 && increment != -1 {
+            if range.count - 2 - decrement > 0 && increment != -1 && decrement != -1 {
                 for index in stride(from: increment, to: range.count - 2 - decrement, by: +lenghtOfRow) {
                     datesWithLenghtOfLayer.updateValue(lenghtOfRow, forKey: range[index])
                 }
