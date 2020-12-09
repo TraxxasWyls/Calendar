@@ -47,8 +47,8 @@ final class CalendarViewController: UIViewController {
             if let secondDate = secondDate,
                let firstDate = firstDate {
                 if firstDate > secondDate {
-                    self.firstDate = secondDate;
-                    self.secondDate = firstDate;
+                    self.firstDate = secondDate
+                    self.secondDate = firstDate
                 }
             }
             if let secondDate = secondDate,
@@ -66,16 +66,12 @@ final class CalendarViewController: UIViewController {
                 if let date = gregorian.date(byAdding: .day, value: 8, to: firstDate) {
                     let range = createRangeOfDates(firstDate: firstDate, secondDate: date)
                     let lenghtForNegative = getLenghtOfSelectionLayerForFirstLine(range: range, at: .current)
-                    let lenghtForPositive = getLenghtOfSelectionLayerForFirstLine(range: self.range, at: .current)
                     let lenght = datesWithLenghtOfLayer[firstDate]
                     if lenghtForNegative == -1,
                        let lenght = lenght {
                         datesWithLenghtOfLayer.updateValue(7-lenght, forKey: firstDate)
-                    } else {
+                    } else if secondDate == nil {
                         datesWithLenghtOfLayer.updateValue(lenghtForNegative, forKey: firstDate)
-                        if  lenghtForPositive != -1 {
-                            datesWithLenghtOfLayer.updateValue(lenghtForPositive, forKey: firstDate)
-                        }
                     }
                     print("FIRST!!!")
                     print(datesWithLenghtOfLayer[firstDate])
@@ -104,15 +100,22 @@ final class CalendarViewController: UIViewController {
             if let secondDate = secondDate,
                let firstDate = firstDate {
                 if firstDate > secondDate {
-                    self.firstDate = secondDate;
-                    self.secondDate = firstDate;
+                    self.firstDate = secondDate
+                    self.secondDate = firstDate
                 }
             }
             if let secondDate = secondDate,
                let firstDate = firstDate {
+                self.firstDate = firstDate
                 range = createRangeOfDates(firstDate: firstDate, secondDate: secondDate)
-                datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForLastLine(range: range, at: .current), forKey: secondDate)
-                datesWithLenghtOfLayer.updateValue(getLenghtOfSelectionLayerForFirstLine(range: range, at: .current), forKey: firstDate)
+                let lenght = getLenghtOfSelectionLayerForLastLine(range: range, at: .current)
+                if lenght != -1 {
+                    datesWithLenghtOfLayer.updateValue(lenght, forKey: secondDate)
+                } else {
+                    if let lenght = datesWithLenghtOfLayer[firstDate] {
+                        datesWithLenghtOfLayer.updateValue(7-lenght, forKey: secondDate)
+                    }
+                }
                 datesWithLenghtOfLayer = setDatesWithLenghtOfLayer(in: range, from: firstDate, to: secondDate)
                 print("SECOND")
                 print(datesWithLenghtOfLayer[secondDate])
@@ -347,7 +350,12 @@ final class CalendarViewController: UIViewController {
                     datesWithLenghtOfLayer.updateValue(lenghtOfRow, forKey: range[index])
                 }
             }
+
+        }
+        if let increment = increment {
             datesWithLenghtOfLayer.updateValue(increment, forKey: from)
+        }
+        if let decrement = decrement {
             datesWithLenghtOfLayer.updateValue(decrement, forKey: to)
         }
         return datesWithLenghtOfLayer

@@ -88,7 +88,7 @@ final class CalendarCell: FSCalendarCell {
                                             width: contentView.frame.width * (CGFloat(lenghtOfSelection)),
                                             height: shapeLayer.frame.height
           )
-        let selectionLayerRightEdge = CGRect(x: contentView.frame.width/2,
+        let selectionLayerRightEdge = CGRect(x: contentView.frame.maxX,
                                              y: shapeLayer.frame.origin.y,
                                              width: -(contentView.frame.width * CGFloat(lenghtOfSelection)),
                                              height: shapeLayer.frame.height
